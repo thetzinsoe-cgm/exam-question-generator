@@ -1,0 +1,258 @@
+@model ExamSystem.DTOs.Question.QuestionResponseDto
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = (ViewBag.FormTitle ?? "Edit") + " Question";
+    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Edit Question";
+    var listingPageUrl = Context.Request.Query["listingPageUrl"].FirstOrDefault() ?? "/admin/question/index";
+    var grades = ViewBag.Grades as System.Collections.IEnumerable ?? new object[0];
+    var qTypes = ViewBag.QuestionTypes as System.Collections.IEnumerable ?? new object[0];
+    var opts = (Model.answer_options ?? new List<ExamSystem.DTOs.Question.AnswerOptionDto>()).OrderBy(a => a.sort_order).ToList();
+    const short BIO_TYPE_ID = 6;
+    const short ECO_TYPE_ID = 7;
+}
+
+@section HeadCss {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"
+          asp-fallback-href="~/plugins/katex/katex.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" crossorigin="anonymous" referrerpolicy="no-referrer"
+          asp-fallback-href="~/plugins/quill/quill.snow.css" />
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="Edit" method="post" class="card shadow-sm" id="questionForm" enctype="multipart/form-data">
+            <input type="hidden" name="listingPageUrl" value="@listingPageUrl" />
+            <input type="hidden" id="existing_grade_id" value="@Model.grade_id" />
+            <input type="hidden" id="existing_subject_id" value="@Model.subject_id" />
+            <input type="hidden" id="existing_question_text" value='@Newtonsoft.Json.JsonConvert.ToString(Model.question_text ?? "")' />
+            <input type="hidden" id="existing_question_html" value='@Newtonsoft.Json.JsonConvert.ToString(Model.question_html ?? "")' />
+            <input type="hidden" id="existing_options_json" value='@Newtonsoft.Json.JsonConvert.SerializeObject(opts)' />
+            <div class="card-header d-flex align-items-center">
+                <h3 class="card-title mb-0"><i class="fas fa-edit mr-2"></i> Edit Question #@Model.id</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-md-3">
+                        <label>Grade *</label>
+                        <select id="grade_id" name="grade_id" class="form-control" required>
+                            @foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
+                            {
+                                <option value="@g.id" selected="@(Model.grade_id == g.id)">@g.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Subject *</label>
+                        <select id="subject_id" name="subject_id" class="form-control" required></select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Question Type *</label>
+                        <select id="question_type" name="question_type" class="form-control" required>
+                            @foreach (var t in System.Linq.Enumerable.Cast<dynamic>(qTypes))
+                            {
+                                <option value="@t.id" selected="@(Model.question_type == t.id)">@t.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Difficulty</label>
+                        <select name="difficulty" class="form-control">
+                            <option value="1" selected="@(Model.difficulty == 1)">Easy</option>
+                            <option value="2" selected="@(Model.difficulty == 2)">Medium</option>
+                            <option value="3" selected="@(Model.difficulty == 3)">Hard</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label>Default Marks</label>
+                        <input type="number" step="0.01" name="default_marks" class="form-control" value="@Model.default_marks" min="0" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Negative Marks</label>
+                        <input type="number" step="0.01" name="negative_marks" class="form-control" value="@Model.negative_marks" min="0" />
+                        <small class="text-muted">0 = no penalty</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Sort Order</label>
+                        <input type="number" name="sort_order" class="form-control" value="@Model.sort_order" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Question Text <small class="text-muted">(KaTeX inline: <code>$x^2$</code>; display: <code>$$\int x dx$$</code>)</small></label>
+                    <div id="quillEditor" style="height:200px"></div>
+                    <input type="hidden" id="question_text_hidden" name="question_text" />
+                    <input type="hidden" id="question_html_hidden" name="question_html" />
+                </div>
+                <div class="row" id="bioImageRow" style="display:none">
+                    <div class="form-group col-md-6">
+                        <label>Upload Image <span class="text-muted">(BIO questions, type @BIO_TYPE_ID)</span></label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" id="bioImageFile" class="custom-file-input" accept="image/*" />
+                                <label class="custom-file-label" for="bioImageFile">Choose image...</label>
+                            </div>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" type="button" id="uploadBioBtn"><i class="fas fa-cloud-upload-alt mr-1"></i> Upload</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="image_url_hidden" name="image_url" value="@Model.image_url" />
+                        <div id="imagePreview" class="mt-2" style="@(string.IsNullOrWhiteSpace(Model.image_url) ? "display:none" : "")">
+                            <img id="imgPrev" class="img-thumbnail" style="max-height:120px" src="@Model.image_url" alt="Current image" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="ecoTableRow" style="display:none">
+                    <label>ECO Calculation Table JSON <span class="text-muted">(type @ECO_TYPE_ID — stored as JSON; exported as HTML Table)</span></label>
+                    <textarea id="ecoTableEditor" name="eco_table_json" class="form-control font-mono" rows="4">@Model.eco_table_json</textarea>
+                    <small class="text-muted">Format: JSON array of arrays. Each nested array = one row.</small>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6"><label>Hint</label><input type="text" name="hint" class="form-control" maxlength="500" value="@Model.hint" placeholder="Optional hint shown to students..." /></div>
+                    <div class="form-group col-md-6"><label>Explanation</label><input type="text" name="explanation" class="form-control" maxlength="1000" value="@Model.explanation" placeholder="Optional rationale/answer key explanation..." /></div>
+                </div>
+                <div class="form-group"><label>Tags <small class="text-muted">(JSON array)</small></label><input type="text" name="tags_json" class="form-control" value="@Model.tags_json" placeholder='["algebra","grade-10"]' /></div>
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" name="is_active" value="true" class="custom-control-input" id="isActive" @(Model.is_active ? "checked" : "") />
+                    <label class="custom-control-label" for="isActive">Active (visible in question bank)</label>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-list-check mr-2"></i> Answer Options</h5>
+                        <button type="button" class="btn btn-sm btn-success" id="addOptionBtn"><i class="fas fa-plus mr-1"></i> Add Option</button>
+                    </div>
+                    <div class="card-body" id="optionsContainer"></div>
+                </div>
+            </div>
+            <div class="card-footer text-right border-top pt-3">
+                <a href="@listingPageUrl" class="btn btn-outline-secondary"><i class="fas fa-times mr-1"></i> Cancel</a>
+                <button type="submit" class="btn btn-primary ml-1"><i class="fas fa-save mr-1"></i> Update</button>
+                <div asp-validation-summary="All" class="text-danger mt-3 text-left"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"
+            asp-fallback-src="~/plugins/quill/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"
+            asp-fallback-src="~/plugins/katex/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"
+            asp-fallback-src="~/plugins/katex/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+    <script>
+        var BIO_TYPE_ID = @BIO_TYPE_ID;
+        var ECO_TYPE_ID = @ECO_TYPE_ID;
+        var quill;
+        var optIdx = 0;
+        function answerOptionTemplate(i, data) {
+            data = data || {};
+            return `
+            <div class="option-row border p-3 mb-3 rounded" data-idx="${i}">
+                <div class="row">
+                    <div class="col-md-1 align-self-center">
+                        <label>Opt ${String.fromCharCode(65 + i)}</label>
+                        <input type="hidden" name="answer_options[${i}].sort_order" value="${data.sort_order ?? i}" />
+                    </div>
+                    <div class="col-md-7">
+                        <input type="text" class="form-control mb-1" placeholder="Option text (supports $x^2$ KaTeX)"
+                            name="answer_options[${i}].option_text" value="${data.option_text ?? ''}" />
+                        <input type="text" class="form-control form-control-sm" placeholder="Option HTML rendering"
+                            name="answer_options[${i}].option_html" value="${data.option_html ?? ''}" />
+                    </div>
+                    <div class="col-md-1"><input type="text" class="form-control" placeholder="Image URL"
+                        name="answer_options[${i}].option_image_url" value="${data.option_image_url ?? ''}" /></div>
+                    <div class="col-md-1 align-self-center">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" name="answer_options[${i}].is_correct" value="true" class="custom-control-input" id="isCor_${i}" ${data.is_correct ? 'checked' : ''} />
+                            <label class="custom-control-label" for="isCor_${i}">Correct?</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1"><input type="number" step="0.01" class="form-control" placeholder="Marks"
+                        name="answer_options[${i}].marks" value="${data.marks ?? 0}" /></div>
+                    <div class="col-md-1 align-self-center text-right"><button type="button" class="btn btn-sm btn-danger removeOption" title="Remove option"><i class="fas fa-times"></i></button></div>
+                </div>
+            </div>`;
+        }
+        function addOption(data) {
+            $('#optionsContainer').append(answerOptionTemplate(optIdx, data));
+            optIdx++;
+        }
+
+        $(function () {
+            quill = new Quill('#quillEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'script': 'sub' }, { 'script': 'super' }],
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['formula', 'blockquote', 'code-block', 'link', 'image'],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Compose your question... Use the \u03A3 button for math formulas (KaTeX).'
+            });
+
+            try {
+                var initHtml = JSON.parse($('#existing_question_html').val() || '""');
+                quill.root.innerHTML = initHtml || $('#existing_question_text').val();
+            } catch (e) { quill.root.innerHTML = $('#existing_question_text').val(); }
+
+            function syncQuestionText() {
+                $('#question_text_hidden').val(quill.getText().trim());
+                $('#question_html_hidden').val(quill.root.innerHTML);
+            }
+            quill.on('text-change', syncQuestionText);
+
+            try {
+                var existingOpts = JSON.parse($('#existing_options_json').val() || '[]');
+                existingOpts.forEach(function (o) { addOption(o); });
+            } catch (e) { for (var i = 0; i < 4; i++) addOption(); }
+
+            function populateSubjects(gradeId, selectedId) {
+                $.getJSON('/admin/question/subjects-by-grade?grade_id=' + gradeId, function (data) {
+                    var list = data.data || data || [];
+                    var sel = $('#subject_id').empty().append('<option value="">-- Subject --');
+                    list.forEach(function (s) {
+                        sel.append($('<option>', { value: s.id, text: s.name, selected: selectedId == s.id }));
+                    });
+                });
+            }
+            populateSubjects($('#existing_grade_id').val(), $('#existing_subject_id').val());
+            $('#grade_id').change(function () { populateSubjects($(this).val(), 0); });
+
+            function typeToggle() {
+                var t = +$('#question_type').val();
+                $('#bioImageRow').toggle(t === BIO_TYPE_ID);
+                $('#ecoTableRow').toggle(t === ECO_TYPE_ID);
+            }
+            $('#question_type').change(typeToggle); typeToggle();
+
+            $('#uploadBioBtn').on('click', function () {
+                var fd = new FormData();
+                var f = $('#bioImageFile')[0].files[0];
+                if (!f) { alert('Select a file first.'); return; }
+                fd.append('file', f);
+                $.ajax({
+                    url: '/admin/question/upload-image', type: 'POST', data: fd, processData: false, contentType: false,
+                    success: function (resp) {
+                        if (resp.success) {
+                            $('#image_url_hidden').val(resp.url);
+                            $('#imgPrev').attr('src', resp.url); $('#imagePreview').show();
+                        } else alert(resp.error || 'Upload failed.');
+                    }
+                });
+            });
+
+            $('#addOptionBtn').on('click', function () { addOption(); });
+            $(document).on('click', '.removeOption', function () { $(this).closest('.option-row').remove(); });
+
+            $('#questionForm').submit(function () { syncQuestionText(); });
+        });
+    </script>
+}

@@ -1,0 +1,72 @@
+################################################################################
+# ExamSystem — .gitignore (ASP.NET Core 8 / Visual Studio)
+################################################################################
+
+# Build artifacts
+[Bb]in/
+[Oo]bj/
+out/
+artifacts/
+publish/
+[Oo]ut/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Build results & intermediates
+*.dll
+*.exe
+*.pdb
+*.cache
+*.binlog
+project.lock.json
+project.fragment.lock.json
+ScaffoldingReadMe.txt
+
+# Test results
+[Tt]est[Rr]esult*/
+TestResult.xml
+nCrunch*/
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!.nuget/packages.config
+
+# Runtime data & logs
+Logs/
+*.log
+
+# User content uploaded at runtime (keep folder via .gitkeep if needed)
+wwwroot/uploads/
+wwwroot/Storage/
+wwwroot/releases/
+
+# Local databases — but KEEP schema bootstrap scripts
+*.mdf
+*.ldf
+*.db
+*.sqlite
+!Database/*.sql
+
+# OS junk
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor backups / swaps
+*.bak
+*~
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace

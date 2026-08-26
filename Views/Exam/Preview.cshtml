@@ -1,0 +1,115 @@
+@model ExamSystem.DTOs.Exam.ExamResponseDto
+@using ExamSystem.Constraints
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Exam Preview - " + Model?.exam_code;
+    ViewData["HeaderTitle"] = "Exam Preview - " + Model?.title;
+}
+@section Toolbar {
+    <div>
+        <a href="/admin/exam/export-pdf/@Model.id" target="_blank" class="btn btn-success"><i class="fas fa-file-pdf mr-1"></i>Download PDF</a>
+        <a href="/admin/exam/index" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+}
+
+<div class="card" style="page-break-inside:avoid">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0"><i class="fas fa-file-alt mr-2"></i>@Model.title</h3>
+        <code>Exam Code: @Model.exam_code</code>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-5">Grade:</dt><dd class="col-7">@Model.grade_name</dd>
+                    <dt class="col-5">Subject:</dt><dd class="col-7">@Model.subject_name</dd>
+                    <dt class="col-5">Exam Date:</dt><dd class="col-7">@Model.exam_date?.ToString("yyyy-MM-dd")</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-5">Duration:</dt><dd class="col-7">@Model.duration_minutes minutes</dd>
+                    <dt class="col-5">Total Questions:</dt><dd class="col-7">@Model.total_questions</dd>
+                    <dt class="col-5">Total Marks / Pass:</dt><dd class="col-7">@Model.total_marks / @Model.pass_marks</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="alert alert-light border">
+            <h6>Instructions</h6>
+            <p class="mb-0">@Model.description</p>
+        </div>
+    </div>
+</div>
+
+@{
+    int qCount = 0;
+    string lastSection = null;
+    foreach (var q in (Model.questions ?? new List<ExamSystem.DTOs.Exam.ExamQuestionDto>()).OrderBy(q => q.question_number))
+    {
+        qCount++;
+        if (q.section_name != lastSection)
+        {
+            if (lastSection != null) { <text></text>; }
+            lastSection = q.section_name;
+            <div class="card mt-3">
+                <div class="card-header bg-light"><h5 class="mb-0">@lastSection</h5></div>
+            </div>
+        }
+        <div class="card border-top-0 rounded-0 mb-1">
+            <div class="card-body py-2">
+                <div class="row">
+                    <div class="col-md-1 text-right font-weight-bold">Q@(q.question_number).</div>
+                    <div class="col-md-11">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="badge badge-pill badge-secondary mr-2">@q.question_type_name</span>
+                            <span class="text-muted">@q.marks_allocated marks</span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(q.image_url))
+                        {
+                            <p><img src="@q.image_url" alt="" class="img-fluid mb-1 border" style="max-height:160px" /></p>
+                        }
+                        <div class="mb-2">@Html.Raw(q.question_text)</div>
+                        @if (!string.IsNullOrWhiteSpace(q.eco_table_json))
+                        {
+                            try
+                            {
+                                var tableData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<List<string>>>(q.eco_table_json ?? "[]");
+                                if (tableData != null && tableData.Any())
+                                {
+                                    <table class="table table-bordered table-sm w-auto">
+                                        @foreach (var row in tableData)
+                                        {
+                                            <tr>
+                                                @foreach (var cell in row)
+                                                {
+                                                    <td>@cell</td>
+                                                }
+                                            </tr>
+                                        }
+                                    </table>
+                                }
+                            }
+                            catch { }
+                        }
+                        @if (q.answer_options != null && q.answer_options.Any())
+                        {
+                            int oidx = 0;
+                            <ol type="A" class="pl-4">
+                                @foreach (var opt in q.answer_options.OrderBy(a => a.sort_order))
+                                {
+                                    oidx++;
+                                    <li>@opt.option_text
+                                        @if (!string.IsNullOrWhiteSpace(opt.option_image_url))
+                                        { <img src="@opt.option_image_url" class="img-fluid ml-2" style="max-height:40px;border:1px solid #ddd" /> }
+                                    </li>
+                                }
+                            </ol>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="text-center text-muted mt-5">--- END OF PAPER ---</div>

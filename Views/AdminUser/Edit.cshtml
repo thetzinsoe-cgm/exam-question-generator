@@ -1,0 +1,59 @@
+@model ExamSystem.DTOs.AdminUser.AdminUserResponseDto
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = (ViewBag.FormTitle ?? "Edit") + " - Admin User";
+    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Edit Admin User";
+    var listingPageUrl = Context.Request.Query["listingPageUrl"].FirstOrDefault() ?? "/admin/admin-user/index";
+}
+<input type="hidden" id="listingPageUrl" value="@listingPageUrl" />
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-body">
+                <form asp-action="Edit" method="post" class="row" onsubmit="$('input[name=listingPageUrl]').val($('#listingPageUrl').val())">
+                    <input type="hidden" name="listingPageUrl" value="" />
+                    <div class="form-group col-md-6">
+                        <label>Username *</label>
+                        <input type="text" name="username" value="@Model.username" class="form-control" required maxlength="100" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Email</label>
+                        <input type="email" name="email" value="@Model.email" class="form-control" maxlength="200" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Full Name</label>
+                        <input type="text" name="full_name" value="@Model.full_name" class="form-control" maxlength="255" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Phone</label>
+                        <input type="text" name="phone" value="@Model.phone" class="form-control" maxlength="30" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>New Password (leave empty to keep)</label>
+                        <input type="password" name="password" class="form-control" minlength="6" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Role *</label>
+                        <select name="role" class="form-control" required>
+                            <option value="1" selected="@(Model.role == 1)">Super Admin</option>
+                            <option value="2" selected="@(Model.role == 2)">Admin</option>
+                            <option value="3" selected="@(Model.role == 3)">Teacher</option>
+                            <option value="4" selected="@(Model.role == 4)">Examiner</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <div class="custom-control custom-checkbox mt-4">
+                            <input type="checkbox" name="is_active" value="true" class="custom-control-input" id="isActive" @(Model.is_active ? "checked" : "") />
+                            <label class="custom-control-label" for="isActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
+                        <a href="@listingPageUrl" class="btn btn-default">Cancel</a>
+                        <div asp-validation-summary="All" class="text-danger mt-3"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

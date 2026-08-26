@@ -1,0 +1,61 @@
+@using ExamSystem.ViewModels.Dashboard
+@model DashboardViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dashboard";
+    ViewData["HeaderTitle"] = "Dashboard";
+}
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box stat-box">
+            <div class="inner"><h3>@Model.TotalGrade</h3><p>Total Grades</p></div>
+            <div class="icon"><i class="fas fa-layer-group"></i></div>
+            <a href="/admin/grade/index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box stat-box">
+            <div class="inner"><h3>@Model.TotalSubject</h3><p>Total Subjects</p></div>
+            <div class="icon"><i class="fas fa-book"></i></div>
+            <a href="/admin/subject/index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box stat-box">
+            <div class="inner"><h3>@Model.TotalQuestionCount</h3><p>Questions</p></div>
+            <div class="icon"><i class="fas fa-question-circle"></i></div>
+            <a href="/admin/question/index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box stat-box">
+            <div class="inner"><h3>@Model.TotalExam</h3><p>Total Exams</p></div>
+            <div class="icon"><i class="fas fa-file-alt"></i></div>
+            <a href="/admin/exam/index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">System Stats</h3></div>
+            <div class="card-body p-0">
+                <table class="table table-striped">
+                    <tr><td>Active Admin Users</td><td class="text-right"><b>@Model.TotalActiveAdmin</b></td></tr>
+                    <tr><td>Marking Rules Configured</td><td class="text-right"><b>@Model.TotalMarkingRules</b></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Quick Actions</h3></div>
+            <div class="card-body">
+                <a href="/admin/question/create" class="btn btn-primary m-1"><i class="fas fa-plus"></i> Add Question</a>
+                <a href="/admin/exam/generate" class="btn btn-success m-1"><i class="fas fa-magic"></i> Generate Exam</a>
+                <a href="/admin/grade/create" class="btn btn-info m-1"><i class="fas fa-layer-plus"></i> Add Grade</a>
+                <a href="/admin/subject/create" class="btn btn-warning m-1"><i class="fas fa-book"></i> Add Subject</a>
+            </div>
+        </div>
+    </div>
+</div>

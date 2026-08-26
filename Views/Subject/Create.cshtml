@@ -1,0 +1,65 @@
+@model ExamSystem.DTOs.Subject.SubjectRequestDto
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = (ViewBag.FormTitle ?? "Create") + " Subject";
+    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Create Subject";
+    var grades = ViewBag.Grades as System.Collections.IEnumerable ?? new object[0];
+}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-xl-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="m-0 font-weight-bold"><i class="fas fa-book mr-2 text-primary"></i>Subject Information</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" class="row g-3">
+                    <div class="form-group col-md-6">
+                        <label>Grade / Level <span class="text-danger">*</span></label>
+                        <select name="grade_id" class="form-control" required>
+                            <option value="">-- Select Grade --</option>
+                            @foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
+                            {
+                                <option value="@g.id">@g.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Subject Code <span class="text-danger">*</span></label>
+                        <input type="text" name="code" class="form-control font-mono" required maxlength="50" placeholder="e.g. MATH-10, ENG-11" />
+                    </div>
+                    <div class="form-group col-12">
+                        <label>Subject Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" required maxlength="255" placeholder="e.g. Mathematics" />
+                    </div>
+                    <div class="form-group col-12">
+                        <label>Description / Curriculum</label>
+                        <textarea name="description" class="form-control" rows="3" maxlength="500" placeholder="Topics covered, reference materials, etc..."></textarea>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Total Marks <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" min="0" name="total_marks" class="form-control" required value="100" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Pass Marks</label>
+                        <input type="number" step="0.01" min="0" name="pass_marks" class="form-control" value="40" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Duration (minutes)</label>
+                        <input type="number" min="0" name="duration_minutes" class="form-control" value="120" />
+                    </div>
+                    <div class="form-group col-md-6 align-self-end pb-2">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" name="is_active" value="true" class="custom-control-input" id="isActive" checked />
+                            <label class="custom-control-label" for="isActive"><strong>Active Status</strong> <small class="text-muted">(allow this subject to be used in exam generation)</small></label>
+                        </div>
+                    </div>
+                    <div class="col-12 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save mr-1"></i>Save Subject</button>
+                        <a href="/admin/subject/index" class="btn btn-outline-secondary px-4 ml-1">Cancel</a>
+                        <div asp-validation-summary="All" class="text-danger mt-3"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

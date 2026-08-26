@@ -1,0 +1,103 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Bulk Import Questions";
+    ViewData["HeaderTitle"] = "Bulk Import Questions";
+    var result = ViewBag.ImportResult;
+}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-header"><h3 class="card-title"><i class="fas fa-file-upload"></i> Bulk Import Questions (Excel .xlsx)</h3></div>
+            <div class="card-body">
+                <form asp-action="BulkImport" method="post" enctype="multipart/form-data">
+                    <div class="form-row mb-3">
+                        <div class="col-md-4">
+                            <label>Grade *</label>
+                            <select id="grade_id" name="grade_id" class="form-control" required>
+                                @{
+                                    var grades = ViewBag.Grades as System.Collections.IEnumerable;
+                                    if (grades != null)
+                                    {
+                                        foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
+                                        {
+                                            <option value="@g.id">@g.name</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Subject *</label>
+                            <select id="subject_id" name="subject_id" class="form-control" required>
+                                <option value="">-- Select Grade First --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Excel File *</label>
+                            <div class="custom-file">
+                                <input type="file" name="file" class="custom-file-input" id="importFile" accept=".xlsx" required />
+                                <label class="custom-file-label" for="importFile">Choose .xlsx file</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-upload"></i> Import</button>
+                </form>
+                <div class="alert alert-info mt-3">
+                    <h6><i class="fas fa-info-circle"></i> Expected Columns in Excel:</h6>
+                    <small>Columns (row 1 header):</small>
+                    <ul class="mb-0">
+                        <li><b>question_text</b> (required) — question text as string</li>
+                        <li><b>question_type</b> — 1-8 or name (1=MultipleChoice, 2=TrueFalse, 3=ShortAnswer, 4=Essay, 5=MathExpression, 6=BIO with Image, 7=ECO Calculation, 8=FillInTheBlank)</li>
+                        <li><b>default_marks, negative_marks, difficulty, sort_order</b></li>
+                        <li><b>option_A, option_B, option_C, option_D</b> — multiple choice option text</li>
+                        <li><b>correct_option</b> — A, B, C, D (or index 1-based)</li>
+                        <li><b>hint, explanation, tags</b></li>
+                    </ul>
+                </div>
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        @if (result != null)
+        {
+            <div class="card card-success">
+                <div class="card-header"><h3 class="card-title">Import Result</h3></div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-8">Total Rows</dt><dd class="col-4">@result.TotalRows</dd>
+                        <dt class="col-8 text-success">Imported</dt><dd class="col-4 text-success">@result.Imported</dd>
+                        <dt class="col-8 text-danger">Failed</dt><dd class="col-4 text-danger">@result.Failed</dd>
+                    </dl>
+                    @if (result.Errors != null && result.Errors.Count > 0)
+                    {
+                        <hr />
+                        <h6>Error Details:</h6>
+                        <div style="max-height:240px;overflow-y:auto">
+                            @foreach (var e in result.Errors)
+                            {
+                                <div class="alert alert-danger py-1 mb-1">
+                                    <small><b>Row @(e.row_number):</b> @e.error_message</small>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    $(function () {
+        $('#grade_id').change(function () {
+            $.getJSON('/admin/question/subjects-by-grade?grade_id=' + $(this).val(), function (data) {
+                var list = data.data || data || [];
+                var sel = $('#subject_id').empty().append('<option value="">-- Subject --</option>');
+                list.forEach(function (s) { sel.append($('<option>', { value: s.id, text: s.name })); });
+            });
+        });
+    });
+</script>
+}

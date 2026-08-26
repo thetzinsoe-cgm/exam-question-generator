@@ -1,0 +1,369 @@
+@model ExamSystem.DTOs.Exam.ExamResponseDto
+@using System.Collections.Generic
+@using System.Linq
+@using Newtonsoft.Json
+@{
+    Layout = null;
+    var questionsOrdered = (Model.questions ?? new List<ExamSystem.DTOs.Exam.ExamQuestionDto>())
+        .OrderBy(q => q.question_number).ToList();
+    var groupedBySection = new Dictionary<string, List<ExamSystem.DTOs.Exam.ExamQuestionDto>>();
+    foreach (var q in questionsOrdered)
+    {
+        var s = string.IsNullOrWhiteSpace(q.section_name) ? "ပုဒ်မခွဲ (၁)" : q.section_name;
+        if (!groupedBySection.ContainsKey(s)) groupedBySection[s] = new List<ExamSystem.DTOs.Exam.ExamQuestionDto>();
+        groupedBySection[s].Add(q);
+    }
+    string MmDigit(int n)
+    {
+        var s = n.ToString();
+        return s.Replace("0","၀").Replace("1","၁").Replace("2","၂").Replace("3","၃").Replace("4","၄")
+                .Replace("5","၅").Replace("6","၆").Replace("7","၇").Replace("8","၈").Replace("9","၉");
+    }
+    string MmAlphaUpper(int i)
+    {
+        char[] arr = { 'က','ခ','ဂ','ဃ','င','စ','ဆ','ဇ','ဈ','ည','ဋ','ဌ','ဍ','ဎ','ဏ','တ','ထ','ဒ','ဓ','န','ပ','ဖ','ဗ','ဘ','ဘ','မ','ယ','ရ','လ','ဝ','သ','ဟ','ဠ','အ' };
+        return i >= 1 && i <= arr.Length ? arr[i - 1].ToString() : i.ToString();
+    }
+    string MmAlphaLower(int i)
+    {
+        char[] arr = { '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉' };
+        return i >= 1 && i <= arr.Length ? arr[i - 1].ToString() : i.ToString();
+    }
+    const short BIO_TYPE_ID = 6;
+    const short ECO_TYPE_ID = 7;
+    const short MATH_TYPE_ID = 5;
+}
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>@(string.IsNullOrWhiteSpace(Model.exam_code) ? "စာမေးပွဲ" : Model.exam_code) - @Model.title</title>
+    <style>
+        @@page {
+            size: A4 portrait;
+            margin: 18mm 15mm 20mm 15mm;
+        }
+        * { box-sizing: border-box; }
+        html, body {
+            font-family: 'Pyidaungsu','Noto Sans Myanmar','Myanmar3','Padauk','WinResearcher','Arial Unicode MS','Segoe UI Historic',Tahoma,Arial,sans-serif;
+            font-size: 12pt;
+            color: #000;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+        body { margin: 0; padding: 0; }
+        .paper-header {
+            text-align: center;
+            margin-bottom: 14pt;
+            padding-bottom: 10pt;
+            border-bottom: 1.5pt solid #000;
+            page-break-after: avoid;
+        }
+        .paper-header .small {
+            font-size: 10.5pt;
+            letter-spacing: 0.25pt;
+            margin: 0;
+        }
+        .paper-header .paper-title {
+            font-size: 14pt;
+            font-weight: 700;
+            margin: 4pt 0 2pt 0;
+        }
+        .paper-header .paper-subtitle {
+            font-size: 12pt;
+            font-weight: 600;
+            margin: 0;
+        }
+        .paper-header .paper-school {
+            font-size: 12pt;
+            font-weight: 700;
+            margin: 6pt 0 0 0;
+        }
+        .meta-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11pt;
+            margin: 6pt 0 14pt 0;
+            page-break-inside: avoid;
+        }
+        .meta-bar .left, .meta-bar .right { min-width: 38%; }
+        .meta-bar .right { text-align: right; }
+        .instructions {
+            border: 1pt solid #000;
+            padding: 6pt 10pt;
+            margin: 0 0 14pt 0;
+            font-size: 11pt;
+            page-break-inside: avoid;
+        }
+        .instructions b { font-weight: 700; }
+        h2.section-title {
+            font-size: 12.5pt;
+            font-weight: 700;
+            margin: 18pt 0 8pt 0;
+            border-bottom: 0.75pt dashed #333;
+            padding-bottom: 3pt;
+            page-break-after: avoid;
+        }
+        .section-mark-hint {
+            float: right;
+            font-weight: 600;
+            font-size: 11pt;
+        }
+        .q {
+            margin: 0 0 12pt 0;
+            padding: 0 0 8pt 0;
+            page-break-inside: avoid;
+        }
+        .q .qhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .q .qnum {
+            font-weight: 700;
+            padding-right: 4pt;
+            white-space: nowrap;
+        }
+        .q .qmarks {
+            font-size: 10.5pt;
+            color: #222;
+            font-style: italic;
+            white-space: nowrap;
+            padding-left: 6pt;
+        }
+        .q .qbody {
+            padding-left: 24pt;
+            margin-top: 1pt;
+        }
+        .q .qimage {
+            margin: 6pt 0 2pt 24pt;
+            text-align: center;
+        }
+        .q .qimage img { max-width: 80%; height: auto; border: 0.5pt solid #666; }
+        .opts {
+            margin: 6pt 0 2pt 24pt;
+            padding: 0;
+        }
+        .opt {
+            display: block;
+            padding: 1pt 0;
+        }
+        .opt .optmark {
+            display: inline-block;
+            width: 22pt;
+            font-weight: 700;
+        }
+        table.eco-table {
+            border-collapse: collapse;
+            width: auto;
+            margin: 6pt 0 6pt 24pt;
+            font-size: 11pt;
+        }
+        table.eco-table th,
+        table.eco-table td {
+            border: 0.75pt solid #000;
+            padding: 3pt 8pt;
+            text-align: left;
+            white-space: nowrap;
+        }
+        table.eco-table th {
+            background: #f2f2f2;
+            font-weight: 700;
+            text-align: center;
+        }
+        table.distro {
+            border-collapse: collapse;
+            margin: 6pt auto 12pt auto;
+            font-size: 11pt;
+        }
+        table.distro th, table.distro td {
+            border: 0.75pt solid #000;
+            padding: 4pt 10pt;
+            text-align: center;
+        }
+        table.distro th { background:#f4f4f4; }
+        .line-blank {
+            border-bottom: 0.75pt dotted #555;
+            display: inline-block;
+            width: 140pt;
+            margin: 0 6pt;
+        }
+        .sub-questions {
+            margin-left: 24pt;
+            margin-top: 4pt;
+        }
+        .sub-questions .sq { padding: 1pt 0; }
+        .sub-questions .sq .sqmark { font-weight: 700; display: inline-block; width: 24pt; }
+        .eop {
+            text-align: center;
+            margin-top: 40pt;
+            font-weight: 700;
+            font-size: 11pt;
+        }
+        .sig-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60pt;
+            font-size: 11pt;
+        }
+        .sig-box { text-align: center; width: 45%; }
+        .sig-box .sig-line { border-top: 0.75pt solid #000; margin-top: 50pt; padding-top: 2pt; }
+    </style>
+</head>
+<body>
+    <div class="paper-header">
+        <p class="small">၂၀၂၆ ခုနှစ်</p>
+        <p class="paper-title">@(string.IsNullOrWhiteSpace(Model.grade_name) ? "" : MmAlphaUpper(1) + ". " + Model.grade_name + " — ")@(string.IsNullOrWhiteSpace(Model.subject_name) ? "မြန်မာနိုင်ငံစီးပွားရေးသင်တန်း" : Model.subject_name)</p>
+        <p class="paper-subtitle">@(Model.title ?? "မေးခွန်းစာအုပ်")</p>
+        <p class="paper-school">@(string.IsNullOrWhiteSpace(Model.description) ? "မြန်မာနိုင်ငံစီးပွားရေးမဟာဝိဒ္ယာလယ္ တကၠသိုလ္" : "")</p>
+    </div>
+
+    <div class="meta-bar">
+        <div class="left">
+            <div><b>စာမေးပွဲအမှတ်စဉ် (အေ) —</b> <span class="line-blank"></span></div>
+            <div><b>အထက်တန်းကောင်စီ ခုံ —</b> <span class="line-blank"></span></div>
+            <div><b>မေးခွန်းအားလုံးဖြေဆိုရမည်။</b></div>
+        </div>
+        <div class="right">
+            <div><b>အချိန် — @(Model.duration_minutes > 0 ? MmDigit(Model.duration_minutes) + " မိနစ်" : "…………… မိနစ်")</b></div>
+            <div><b>အမှတ် — @(Model.total_marks > 0 ? MmDigit((int)Model.total_marks) : "………")</b></div>
+            <div><b>ရှစ်ပြုချိန် — ၃ နာရီ</b></div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.description))
+    {
+        <div class="instructions">
+            <b>မေးခွန်းအားလုံးဖြေဆိုရမည်။ ——</b> @Model.description
+        </div>
+    }
+
+    @{
+        int sectionIndex = 0;
+        int globalQIndex = 0;
+    }
+    @foreach (var section in groupedBySection)
+    {
+        sectionIndex++;
+        var secMarks = section.Value.Sum(q => Math.Max(0, q.marks_allocated));
+        <h2 class="section-title">
+            <span class="section-mark-hint">(အမှတ် @MmDigit((int)Math.Max(secMarks, 0)))</span>
+            @(section.Key)
+        </h2>
+        @foreach (var q in section.Value)
+        {
+            globalQIndex++;
+            var isBIO = q.question_type == BIO_TYPE_ID;
+            var isECO = q.question_type == ECO_TYPE_ID;
+            var isMath = q.question_type == MATH_TYPE_ID;
+            var qBodyText = string.IsNullOrWhiteSpace(q.question_html) ? q.question_text : q.question_html;
+
+            <div class="q">
+                <div class="qhead">
+                    <span class="qnum">@MmAlphaUpper(globalQIndex)။</span>
+                    <div style="flex:1">
+                        @Html.Raw(qBodyText)
+                    </div>
+                    <span class="qmarks">[ အမှတ် @MmDigit((int)Math.Max(q.marks_allocated, 0)) ]</span>
+                </div>
+
+                @if (isBIO && !string.IsNullOrWhiteSpace(q.image_url))
+                {
+                    <div class="qimage">
+                        <img src="@q.image_url" alt="ပုံ" />
+                    </div>
+                }
+
+                @if (isECO && !string.IsNullOrWhiteSpace(q.eco_table_json))
+                {
+                    try
+                    {
+                        var td = JsonConvert.DeserializeObject<List<List<string>>>(q.eco_table_json ?? "[]");
+                        if (td != null && td.Any())
+                        {
+                            <table class="eco-table">
+                                @{
+                                    int rowIdx = 0;
+                                    foreach (var r in td)
+                                    {
+                                        rowIdx++;
+                                        <tr>
+                                            @foreach (var c in r)
+                                            {
+                                                if (rowIdx == 1) { <th>@c</th> }
+                                                else { <td>@c</td> }
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </table>
+                        }
+                    }
+                    catch { }
+                }
+
+                @{
+                    var optsList = (q.answer_options ?? new List<ExamSystem.DTOs.Question.AnswerOptionDto>())
+                        .OrderBy(o => o.sort_order).ToList();
+                }
+                @if (optsList.Any())
+                {
+                    <div class="opts">
+                        @for (int oi = 1; oi <= optsList.Count; oi++)
+                        {
+                            var o = optsList[oi - 1];
+                            var txt = string.IsNullOrWhiteSpace(o.option_html) ? o.option_text : o.option_html;
+                            <div class="opt">
+                                <span class="optmark">(@MmAlphaLower(oi))</span>@Html.Raw(txt)
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    }
+
+    @{
+        // ---- Mark Distribution (ဆိုင်းငံ့ချက် ဇယား) Table (from ECO sample p.3) ----
+        var marksBuckets = questionsOrdered
+            .GroupBy(q => Math.Max(0, q.marks_allocated))
+            .OrderBy(g => g.Key)
+            .ToList();
+        if (marksBuckets.Any() && marksBuckets.Count <= 12)
+        {
+            <h2 class="section-title">
+                <span class="section-mark-hint">(အမှတ် @MmDigit(questionsOrdered.Count))</span>
+                ၂။ အောက်ပါအကြောင်းအရာများကို ဇယားပုံစံဖြင့် ဖော်ပြပါ။
+            </h2>
+            <table class="distro">
+                <thead>
+                    <tr>
+                        <th>အမှတ်ပေးချက် (ကျပ်)</th>
+                        @foreach (var b in marksBuckets) { <th>@MmDigit((int)b.Key * 100)</th> }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>အရေအတွက်</th>
+                        @foreach (var b in marksBuckets) { <td>@MmDigit(b.Count())</td> }
+                    </tr>
+                </tbody>
+            </table>
+        }
+    }
+
+    <div class="eop">— အဆုံး —</div>
+
+    <div class="sig-bar">
+        <div class="sig-box">
+            စုံစမ်းသူ စာမေးပွဲရေးဆွဲသူ
+            <div class="sig-line">အမှတ်တံဆိပ် နှင့် လက်မှတ်</div>
+        </div>
+        <div class="sig-box">
+            အကြီးအကဲ မှတ်ပုံတင်
+            <div class="sig-line">အမှတ်တံဆိပ် နှင့် လက်မှတ်</div>
+        </div>
+    </div>
+</body>
+</html>

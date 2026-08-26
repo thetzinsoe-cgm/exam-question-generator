@@ -1,0 +1,47 @@
+@using ExamSystem.ViewModels.Grade
+@model GradeIndexViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Grades";
+    ViewData["HeaderTitle"] = "Grade Management";
+}
+@section Toolbar {
+    <a href="/admin/grade/create" class="btn btn-primary"><i class="fas fa-plus mr-1"></i>Add Grade</a>
+}
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row mb-3">
+            <div class="col-md-4"><input type="text" name="search" value="@Model.Filter.search" class="form-control" placeholder="Search grade name..." /></div>
+            <div class="col-md-2">@Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", onchange = "$(this).closest('form').submit()" })</div>
+            <div class="col-md-6 text-right">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                <a href="/admin/grade/index" class="btn btn-default"><i class="fas fa-redo"></i> Reset</a>
+            </div>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead><tr><th>Id</th><th>Name</th><th>Level</th><th>Subjects</th><th>Sort Order</th><th>Status</th><th class="text-center" style="width:160px">Action</th></tr></thead>
+                <tbody>
+                    @if (Model.Response.Data != null && Model.Response.Data.Any())
+                    {
+                        foreach (var g in Model.Response.Data)
+                        {
+                            <tr>
+                                <td>@g.id</td><td>@g.name</td><td>@g.level</td>
+                                <td><span class="badge badge-pill badge-info">@g.subject_count</span></td>
+                                <td>@g.sort_order</td>
+                                <td>@if (g.is_active) { <span class="badge badge-success">Active</span> } else { <span class="badge badge-danger">Inactive</span> }</td>
+                                <td class="text-center">
+                                    <a href="/admin/grade/edit/@g.id?listingPageUrl=@Context.Request.Path@Context.Request.QueryString" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                    <a href="/admin/grade/delete/@g.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-danger" onclick="return confirm('Delete this grade?')"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else { <tr><td colspan="7" class="text-center text-muted">No grades found.</td></tr> }
+                </tbody>
+            </table>
+        </div>
+        @Html.Partial("_PaginationPartial")
+    </div>
+</div>

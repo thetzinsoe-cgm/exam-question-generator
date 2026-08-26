@@ -1,0 +1,76 @@
+@{ Layout = null; }
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register — ExamSystem</title>
+    <link rel="stylesheet" href="~/plugins/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/plugins/fontawesome/css/all.min.css" />
+    <style>
+        body{background:linear-gradient(135deg,#43cea2 0%,#185a9d 100%);min-height:100vh;padding:2rem 0}
+        .card{border:none;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+        .brand-logo{font-size:2rem;font-weight:800;background:linear-gradient(90deg,#43cea2,#185a9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card">
+                    <div class="card-header text-center bg-white border-0 pt-4">
+                        <div class="brand-logo"><i class="fas fa-user-plus mr-2"></i>ExamSystem Register</div>
+                        <p class="text-muted">Create your admin account</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form asp-action="Register" method="post">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Username *</label>
+                                    <input type="text" name="username" class="form-control" required maxlength="100" />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Email</label>
+                                    <input type="email" name="email" class="form-control" maxlength="200" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" name="full_name" class="form-control" maxlength="255" />
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Password *</label>
+                                    <input type="password" name="password" class="form-control" required minlength="6" />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Role</label>
+                                    <select name="role" class="form-control">
+                                        <option value="2">Admin</option>
+                                        <option value="3">Teacher</option>
+                                        <option value="4">Examiner</option>
+                                        <option value="1">Super Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="text" name="phone" class="form-control" maxlength="30" />
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg btn-block" style="background:linear-gradient(90deg,#43cea2,#185a9d);border:none">
+                                <i class="fas fa-user-plus mr-2"></i>Register
+                            </button>
+                            <div class="text-danger mt-3" asp-validation-summary="All"></div>
+                        </form>
+                        <div class="text-center mt-3">
+                            <a href="/admin/login" class="text-muted">Already have an account? Sign in</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

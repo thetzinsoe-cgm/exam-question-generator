@@ -1,0 +1,79 @@
+@model ExamSystem.DTOs.MarkingRule.MarkingRuleResponseDto
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = (ViewBag.FormTitle ?? "Edit") + " Marking Rule";
+    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Edit Marking Rule";
+    var listingPageUrl = Context.Request.Query["listingPageUrl"].FirstOrDefault() ?? "/admin/marking-rule/index";
+    var subjects = ViewBag.Subjects as System.Collections.IEnumerable ?? new object[0];
+    var qTypes = ViewBag.QuestionTypes as System.Collections.IEnumerable ?? new object[0];
+}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-body">
+                <form asp-action="Edit" method="post" class="row">
+                    <input type="hidden" name="listingPageUrl" value="@listingPageUrl" />
+                    <div class="form-group col-md-6">
+                        <label>Subject *</label>
+                        <select name="subject_id" class="form-control" required>
+                            @foreach (var s in System.Linq.Enumerable.Cast<dynamic>(subjects))
+                            {
+                                <option value="@s.id" selected="@(Model.subject_id == s.id)">@s.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Question Type *</label>
+                        <select name="question_type" class="form-control" required>
+                            @foreach (var t in System.Linq.Enumerable.Cast<dynamic>(qTypes))
+                            {
+                                <option value="@t.id" selected="@(Model.question_type == t.id)">@t.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6"><label>Rule Name</label><input type="text" name="rule_name" class="form-control" maxlength="100" value="@Model.rule_name" /></div>
+                    <div class="form-group col-md-6">
+                        <label>Difficulty</label>
+                        <select name="difficulty" class="form-control">
+                            <option value="1" selected="@(Model.difficulty == 1)">Easy</option>
+                            <option value="2" selected="@(Model.difficulty == 2)">Medium</option>
+                            <option value="3" selected="@(Model.difficulty == 3)">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Marks per Question *</label>
+                        <input type="number" step="0.01" min="0" name="marks_per_question" value="@Model.marks_per_question" class="form-control" required />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Negative Marks</label>
+                        <input type="number" step="0.01" min="0" name="negative_marks" value="@Model.negative_marks" class="form-control" />
+                    </div>
+                    <div class="form-group col-md-4"></div>
+                    <div class="form-group col-md-4">
+                        <label>Min Questions</label>
+                        <input type="number" min="0" name="min_questions" value="@Model.min_questions" class="form-control" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Max Questions</label>
+                        <input type="number" min="0" name="max_questions" value="@Model.max_questions" class="form-control" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <div class="custom-control custom-checkbox mt-4">
+                            <input type="checkbox" name="is_active" value="true" class="custom-control-input" id="isActive" @(Model.is_active ? "checked" : "") />
+                            <label class="custom-control-label" for="isActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label>Description</label>
+                        <textarea name="description" class="form-control" rows="2" maxlength="500">@Model.description</textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
+                        <a href="@listingPageUrl" class="btn btn-default">Cancel</a>
+                        <div asp-validation-summary="All" class="text-danger mt-3"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

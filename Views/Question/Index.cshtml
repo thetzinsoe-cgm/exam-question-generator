@@ -1,0 +1,116 @@
+@using ExamSystem.ViewModels.Question
+@model QuestionIndexViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Question Bank";
+    ViewData["HeaderTitle"] = "Question Bank";
+}
+@section Toolbar {
+    <a href="/admin/question/create" class="btn btn-primary"><i class="fas fa-plus mr-1"></i>Add Question</a>
+    <a href="/admin/question/bulk-import" class="btn btn-warning"><i class="fas fa-file-upload mr-1"></i>Bulk Import</a>
+}
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row mb-3">
+            <div class="col-md-3"><input type="text" name="search" value="@Model.Filter.search" class="form-control" placeholder="Search question text..." /></div>
+            <div class="col-md-2">
+                @{
+                    var grades = ViewBag.Grades as System.Collections.IEnumerable ?? new object[0];
+                }
+                <select name="grade_id" id="gradeFilter" class="form-control">
+                    <option value="" selected="@(Model.Filter.grade_id == null)">All Grades</option>
+                    @foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
+                    {
+                        <option value="@g.id" selected="@(Model.Filter.grade_id == g.id)">@g.name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="subject_id" id="subjectFilter" class="form-control">
+                    <option value="" selected="@(Model.Filter.subject_id == null)">All Subjects</option>
+                    @{
+                        var subjects = ViewBag.Subjects as System.Collections.IEnumerable;
+                        if (subjects != null)
+                        {
+                            foreach (var s in System.Linq.Enumerable.Cast<dynamic>(subjects))
+                            {
+                                <option value="@s.id" selected="@(Model.Filter.subject_id == s.id)">@s.name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="question_type" class="form-control">
+                    <option value="" selected="@(Model.Filter.question_type == null)">All Types</option>
+                    <option value="1" selected="@(Model.Filter.question_type == 1)">Multiple Choice</option>
+                    <option value="2" selected="@(Model.Filter.question_type == 2)">True/False</option>
+                    <option value="3" selected="@(Model.Filter.question_type == 3)">Short Answer</option>
+                    <option value="4" selected="@(Model.Filter.question_type == 4)">Essay</option>
+                    <option value="5" selected="@(Model.Filter.question_type == 5)">Math Expression (KaTeX)</option>
+                    <option value="6" selected="@(Model.Filter.question_type == 6)">BIO with Image</option>
+                    <option value="7" selected="@(Model.Filter.question_type == 7)">ECO Calculation</option>
+                    <option value="8" selected="@(Model.Filter.question_type == 8)">Fill in the Blanks</option>
+                </select>
+            </div>
+            <div class="col-md-1">@Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", onchange = "$(this).closest('form').submit()" })</div>
+            <div class="col-md-2 text-right">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                <a href="/admin/question/index" class="btn btn-default"><i class="fas fa-redo"></i></a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Id</th><th>Type</th><th>Grade / Subject</th><th>Question (Preview)</th>
+                        <th>Default Marks</th><th>Difficulty</th><th>Status</th>
+                        <th class="text-center" style="width:160px">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Response.Data != null && Model.Response.Data.Any())
+                    {
+                        foreach (var q in Model.Response.Data)
+                        {
+                            <tr>
+                                <td>@q.id</td>
+                                <td><span class="badge badge-pill badge-secondary">@q.question_type_name</span></td>
+                                <td><small>Grade: @q.grade_name<br/>Subject: @q.subject_name</small></td>
+                                <td style="max-width:420px">
+                                    @if (!string.IsNullOrWhiteSpace(q.image_url)) { <img src="@q.image_url" class="img-fluid mb-1" style="max-height:40px;border:1px solid #ddd" /> }
+                                    <div>@((q.question_text ?? "").Length > 120 ? q.question_text.Substring(0, 120) + "..." : q.question_text)</div>
+                                </td>
+                                <td>@q.default_marks</td>
+                                <td><span class="badge badge-pill badge-@(q.difficulty == 1 ? "success" : q.difficulty == 2 ? "warning" : "danger")">@(q.difficulty == 1 ? "Easy" : q.difficulty == 2 ? "Medium" : "Hard")</span></td>
+                                <td>@if (q.is_active) { <span class="badge badge-success">Active</span> } else { <span class="badge badge-danger">Inactive</span> }</td>
+                                <td class="text-center">
+                                    <a href="/admin/question/edit/@q.id?listingPageUrl=@Context.Request.Path@Context.Request.QueryString" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                    <a href="/admin/question/delete/@q.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-danger" onclick="return confirm('Delete this question?')"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else { <tr><td colspan="8" class="text-center text-muted">No questions found.</td></tr> }
+                </tbody>
+            </table>
+        </div>
+        @Html.Partial("_PaginationPartial")
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    $(function () {
+        var getSubjects = function (gradeId) {
+            $.getJSON('/admin/question/subjects-by-grade?grade_id=' + gradeId, function (data) {
+                var sel = $('#subjectFilter').empty().append('<option value="">All Subjects</option>');
+                $.each(data.data || data, function (_, s) { sel.append('<option value="' + s.id + '">' + s.name + '</option>'); });
+            });
+        };
+        $('#gradeFilter').change(function () { getSubjects($(this).val()); });
+        if ($('#gradeFilter').val()) getSubjects($('#gradeFilter').val());
+    });
+</script>
+}

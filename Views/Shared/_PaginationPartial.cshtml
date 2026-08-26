@@ -1,0 +1,66 @@
+@{
+    int totalItems = ViewBag.TotalItems ?? 0;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int pageNumber = ViewBag.PageNumber ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    var qs = System.Web.HttpUtility.ParseQueryString(Context.Request.QueryString.ToString());
+    var pages = new List<int>();
+    for (int i = Math.Max(1, pageNumber - 2); i <= Math.Min(totalPages, pageNumber + 2); i++) pages.Add(i);
+    var startIdx = totalItems == 0 ? 0 : (pageNumber - 1) * pageSize + 1;
+    var endIdx = Math.Min(pageNumber * pageSize, totalItems);
+}
+
+@if (totalPages > 1)
+{
+    <div class="row align-items-center py-3 px-1">
+        <div class="col-md-5 col-sm-12 mb-2 mb-md-0 text-center text-md-left">
+            <span class="text-muted small">
+                <i class="fas fa-list mr-1"></i>
+                Showing <strong class="text-dark">@startIdx</strong> -
+                <strong class="text-dark">@endIdx</strong> of
+                <strong class="text-dark">@totalItems</strong> entries
+            </span>
+        </div>
+        <div class="col-md-7 col-sm-12 d-flex justify-content-center justify-content-md-end">
+            <nav aria-label="Pagination">
+                <ul class="pagination pagination-sm mb-0 flex-wrap">
+                    <li class="page-item @(pageNumber <= 1 ? "disabled" : "")">
+                        <a class="page-link" href="?@BuildQs(1)" aria-label="First" @(pageNumber <= 1 ? "tabindex=\"-1\"" : "")>
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item @(pageNumber <= 1 ? "disabled" : "")">
+                        <a class="page-link" href="?@BuildQs(pageNumber - 1)" aria-label="Previous" @(pageNumber <= 1 ? "tabindex=\"-1\"" : "")>
+                            <span aria-hidden="true">&lsaquo;</span>
+                        </a>
+                    </li>
+                    @foreach (var p in pages)
+                    {
+                        <li class="page-item @(p == pageNumber ? "active" : "")">
+                            <a class="page-link" href="?@BuildQs(p)">@p</a>
+                        </li>
+                    }
+                    <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?@BuildQs(pageNumber + 1)" aria-label="Next" @(pageNumber >= totalPages ? "tabindex=\"-1\"" : "")>
+                            <span aria-hidden="true">&rsaquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?@BuildQs(totalPages)" aria-label="Last" @(pageNumber >= totalPages ? "tabindex=\"-1\"" : "")>
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+}
+
+@functions {
+    string BuildQs(int page)
+    {
+        var qs = System.Web.HttpUtility.ParseQueryString(Context.Request.QueryString.ToString());
+        qs["page_number"] = page.ToString();
+        return qs.ToString();
+    }
+}

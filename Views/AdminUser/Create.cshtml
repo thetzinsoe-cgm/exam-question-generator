@@ -1,0 +1,60 @@
+@model ExamSystem.DTOs.AdminUser.AdminUserRequestDto
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = (ViewBag.FormTitle ?? "Create") + " - Admin User";
+    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Create Admin User";
+}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-xl-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="m-0 font-weight-bold"><i class="fas fa-user-plus mr-2 text-primary"></i>New Admin User</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" class="row g-3">
+                    <div class="form-group col-md-6">
+                        <label>Username <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control" placeholder="e.g. john.doe" required maxlength="100" autocomplete="username" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Email Address</label>
+                        <input type="email" name="email" class="form-control" placeholder="name@example.com" maxlength="200" autocomplete="email" />
+                    </div>
+                    <div class="form-group col-md-8">
+                        <label>Full Name</label>
+                        <input type="text" name="full_name" class="form-control" placeholder="Display name for this user" maxlength="255" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>Phone Number</label>
+                        <input type="text" name="phone" class="form-control" maxlength="30" placeholder="+95 9 XXX XXX XXX" autocomplete="tel" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Role <span class="text-danger">*</span></label>
+                        <select name="role" class="form-control" required>
+                            <option value="2">Admin</option>
+                            <option value="3">Teacher</option>
+                            <option value="4">Examiner</option>
+                            <option value="1">Super Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Initial Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password" class="form-control" minlength="6" required autocomplete="new-password" placeholder="At least 6 characters" />
+                        <small class="form-text text-muted">User will be prompted to change this on first login.</small>
+                    </div>
+                    <div class="form-group col-md-6 align-self-end pb-2">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" name="is_active" value="true" class="custom-control-input" id="isActive" checked />
+                            <label class="custom-control-label" for="isActive"><strong>Active Status</strong> <small class="text-muted">(disabled users cannot sign in)</small></label>
+                        </div>
+                    </div>
+                    <div class="col-12 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save mr-1"></i>Create User</button>
+                        <a href="/admin/admin-user/index" class="btn btn-outline-secondary px-4 ml-1">Cancel</a>
+                        <div asp-validation-summary="All" class="text-danger mt-3"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,97 @@
+@using ExamSystem.ViewModels.Exam
+@model ExamIndexViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Exams";
+    ViewData["HeaderTitle"] = "Exams";
+}
+@section Toolbar {
+    <a href="/admin/exam/generate" class="btn btn-primary"><i class="fas fa-magic mr-1"></i>Generate New Exam</a>
+}
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row mb-3">
+            <div class="col-md-3"><input type="text" name="search" value="@Model.Filter.search" class="form-control" placeholder="Search title/code..." /></div>
+            <div class="col-md-2">
+                @{
+                    var grades = ViewBag.Grades as System.Collections.IEnumerable ?? new object[0];
+                }
+                <select name="grade_id" id="gradeFilter" class="form-control">
+                    <option value="" selected="@(Model.Filter.grade_id == null)">All Grades</option>
+                    @foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
+                    {
+                        <option value="@g.id" selected="@(Model.Filter.grade_id == g.id)">@g.name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="subject_id" id="subjectFilter" class="form-control">
+                    <option value="" selected="@(Model.Filter.subject_id == null)">All Subjects</option>
+                    @{
+                        var subjects = ViewBag.Subjects as System.Collections.IEnumerable;
+                        if (subjects != null)
+                        {
+                            foreach (var s in System.Linq.Enumerable.Cast<dynamic>(subjects))
+                            {
+                                <option value="@s.id" selected="@(Model.Filter.subject_id == s.id)">@s.name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">@Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", onchange = "$(this).closest('form').submit()" })</div>
+            <div class="col-md-3 text-right">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                <a href="/admin/exam/index" class="btn btn-default"><i class="fas fa-redo"></i></a>
+            </div>
+        </form>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Exam Code</th><th>Title</th><th>Grade</th><th>Subject</th>
+                    <th>Q Count</th><th>Duration</th><th>Total Marks</th><th>Exam Date</th>
+                    <th class="text-center" style="width:240px">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Response.Data != null && Model.Response.Data.Any())
+                {
+                    foreach (var e in Model.Response.Data)
+                    {
+                        <tr>
+                            <td><code>@e.exam_code</code></td>
+                            <td>@e.title</td>
+                            <td>@e.grade_name</td><td>@e.subject_name</td>
+                            <td><span class="badge badge-info">@e.total_questions</span></td>
+                            <td>@e.duration_minutes min</td>
+                            <td>@e.total_marks</td>
+                            <td>@e.exam_date?.ToString("yyyy-MM-dd")</td>
+                            <td class="text-center">
+                                <a href="/admin/exam/preview/@e.id" class="btn btn-sm btn-outline-primary" title="Preview"><i class="fas fa-eye"></i></a>
+                                <a href="/admin/exam/export-pdf/@e.id" target="_blank" class="btn btn-sm btn-outline-success" title="Export PDF"><i class="fas fa-file-pdf"></i></a>
+                                <a href="/admin/exam/delete/@e.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-danger" onclick="return confirm('Delete this exam?')" title="Delete"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else { <tr><td colspan="9" class="text-center text-muted">No exams found. Click "Generate New Exam" to create one.</td></tr> }
+            </tbody>
+        </table>
+        @Html.Partial("_PaginationPartial")
+    </div>
+</div>
+@section Scripts {
+<script>
+    $(function () {
+        $('#gradeFilter').change(function () {
+            $.getJSON('/admin/exam/subjects-by-grade?grade_id=' + $(this).val(), function () { }).fail(function () { });
+            var gid = $(this).val();
+            $.getJSON('/admin/question/subjects-by-grade?grade_id=' + gid, function (data) {
+                var list = data.data || data || [];
+                var sel = $('#subjectFilter').empty().append('<option value="">All Subjects</option>');
+                list.forEach(function (s) { sel.append($('<option>', { value: s.id, text: s.name })); });
+            });
+        });
+    });
+</script>
+}

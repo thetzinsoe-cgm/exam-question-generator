@@ -1,0 +1,15 @@
+{
+  "outputFileName": "wwwroot/css/bundle.min.css",
+  "inputFiles": [
+    "wwwroot/plugins/bootstrap/css/bootstrap.min.css",
+    "wwwroot/css/site.css"
+  ]
+},
+{
+  "outputFileName": "wwwroot/js/bundle.min.js",
+  "inputFiles": [
+    "wwwroot/plugins/jquery/jquery.min.js",
+    "wwwroot/plugins/bootstrap/js/bootstrap.bundle.min.js",
+    "wwwroot/js/site.js"
+  ]
+}

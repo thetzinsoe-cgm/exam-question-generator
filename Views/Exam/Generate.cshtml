@@ -1,0 +1,177 @@
+@model ExamSystem.DTOs.Exam.ExamGenerateRequestDto
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = (ViewBag.FormTitle ?? "Generate") + " Exam";
+    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Generate Exam";
+    var grades = ViewBag.Grades as System.Collections.IEnumerable ?? new object[0];
+}
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-magic"></i> Configure &amp; Generate Exam</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="Generate" method="post" id="examForm">
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <label>Title *</label>
+                    <input type="text" name="title" class="form-control" maxlength="255" required placeholder="Mid Term - Mathematics 10" />
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Grade *</label>
+                    <select id="grade_id" name="grade_id" class="form-control" required>
+                        <option value="">-- Grade --</option>
+                        @foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
+                        {
+                            <option value="@g.id">@g.name</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Subject *</label>
+                    <select id="subject_id" name="subject_id" class="form-control" required>
+                        <option value="">-- Subject --</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Exam Date</label>
+                    <input type="date" name="exam_date" class="form-control" />
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Duration (min)</label>
+                    <input type="number" min="1" name="duration_minutes" class="form-control" value="120" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label>Total Questions (optional)</label>
+                    <input type="number" min="0" name="total_questions" class="form-control" placeholder="auto from rules" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Total Marks (optional)</label>
+                    <input type="number" step="0.01" min="0" name="total_marks" class="form-control" placeholder="auto from rules" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Pass Marks (optional)</label>
+                    <input type="number" step="0.01" min="0" name="pass_marks" class="form-control" />
+                </div>
+                <div class="form-group col-md-3 mt-4">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="randomize_questions" value="true" class="custom-control-input" id="randQ" checked />
+                        <label class="custom-control-label" for="randQ">Randomize question order</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description / Instructions</label>
+                <textarea name="description" class="form-control" rows="3" maxlength="1000">Write your name and ID clearly. Read each question carefully before answering. Use the back of the sheet if you need extra space.</textarea>
+            </div>
+
+            <div class="card card-secondary">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Section Configuration <small class="text-muted">(leave empty to auto-build from subject Marking Rules)</small></h5>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-info" id="loadFromRulesBtn"><i class="fas fa-layer-group"></i> Load from Marking Rules</button>
+                        <button type="button" class="btn btn-sm btn-success" id="addSectionBtn"><i class="fas fa-plus"></i> Add Section</button>
+                    </div>
+                </div>
+                <div class="card-body" id="sectionsContainer">
+                    <div class="alert alert-info">If no sections are defined, the generator will automatically build sections using the subject's configured marking rules.</div>
+                </div>
+            </div>
+
+            <div class="text-right mt-4">
+                <a href="/admin/exam/index" class="btn btn-default">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-magic"></i> Generate Exam</button>
+                <div asp-validation-summary="All" class="text-danger mt-3 text-left"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var sIdx = 0;
+    function sectionTemplate(idx, data) {
+        data = data || {};
+        return `
+        <div class="border p-3 mb-3 rounded section-row" data-idx="${idx}">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Section Name</label>
+                    <input type="text" name="sections[${idx}].section_name" value="${data.section_name ?? ('Section ' + (idx+1))}" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Question Type</label>
+                    <select name="sections[${idx}].question_type" class="form-control sec-qtype">
+                        <option value="1">Multiple Choice</option>
+                        <option value="2">True/False</option>
+                        <option value="3">Short Answer</option>
+                        <option value="4">Essay</option>
+                        <option value="5">Match</option>
+                        <option value="6">Fill Blanks</option>
+                        <option value="7">Math Expression</option>
+                        <option value="8">BIO with Image</option>
+                        <option value="9">ECO Calculation</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>Difficulty</label>
+                    <select name="sections[${idx}].difficulty" class="form-control">
+                        <option value="">Any</option>
+                        <option value="1">Easy</option>
+                        <option value="2">Medium</option>
+                        <option value="3">Hard</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label>Count</label>
+                    <input type="number" name="sections[${idx}].question_count" class="form-control" min="1" value="${data.question_count ?? 10}" />
+                </div>
+                <div class="col-md-1">
+                    <label>Marks/Q</label>
+                    <input type="number" step="0.01" name="sections[${idx}].marks_per_question" class="form-control" min="0" value="${data.marks_per_question ?? 1}" />
+                </div>
+                <div class="col-md-1">
+                    <label>-ve</label>
+                    <input type="number" step="0.01" name="sections[${idx}].negative_marks" class="form-control" min="0" value="${data.negative_marks ?? 0}" />
+                </div>
+                <div class="col-md-1 align-self-end text-right">
+                    <button type="button" class="btn btn-sm btn-danger removeSec"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+        </div>`;
+    }
+    function addSection(data) {
+        $('#sectionsContainer').find('.alert').remove();
+        $('#sectionsContainer').append(sectionTemplate(sIdx, data));
+        if (data && data.question_type) {
+            $('.section-row').last().find('.sec-qtype').val(data.question_type);
+        }
+        sIdx++;
+    }
+
+    $(function () {
+        $('#grade_id').change(function () {
+            $.getJSON('/admin/question/subjects-by-grade?grade_id=' + $(this).val(), function (data) {
+                var list = data.data || data || [];
+                var sel = $('#subject_id').empty().append('<option value="">-- Subject --');
+                list.forEach(function (s) { sel.append($('<option>', { value: s.id, text: s.name })); });
+            });
+        });
+
+        $('#addSectionBtn').on('click', function () { addSection(); });
+        $(document).on('click', '.removeSec', function () { $(this).closest('.section-row').remove(); });
+
+        $('#loadFromRulesBtn').on('click', function () {
+            var subj = $('#subject_id').val();
+            if (!subj) { alert('Please select a subject first.'); return; }
+            $.getJSON('/admin/marking-rules-by-subject?subjectId=' + subj, function (data) {
+                var rules = data.data || data || [];
+                if (!rules.length) { alert('No marking rules configured for this subject.'); return; }
+                $('#sectionsContainer').empty(); sIdx = 0;
+                rules.forEach(function (r) { addSection({ question_type: r.question_type, section_name: (r.rule_name || ('Type ' + r.question_type)), question_count: (r.max_questions || r.min_questions || 10), marks_per_question: r.marks_per_question, negative_marks: r.negative_marks }); });
+            });
+        });
+    });
+</script>
+}

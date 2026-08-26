@@ -1,0 +1,200 @@
+@using ExamSystem.Constraints
+@using ExamSystem.Provider
+@{
+    var displayName = User.Claims.FirstOrDefault(c => c.Type == UserClaims.Name)?.Value ?? "Admin";
+    var roleName = User.Claims.FirstOrDefault(c => c.Type == UserClaims.Role)?.Value;
+    var roleStr = short.TryParse(roleName, out var r) ? r.GetRoleName() : "Admin";
+    var active = Context.Request.Path.Value ?? "";
+    var headerTitle = ViewData["HeaderTitle"] as string ?? ViewBag.FormTitle as string ?? "Dashboard";
+
+    bool IsNavActive(string segment) => active.Contains(segment, StringComparison.OrdinalIgnoreCase);
+    string NavCurrent(string segment) => IsNavActive(segment) ? "page" : "false";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ExamSystem Admin</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+              asp-fallback-href="~/plugins/bootstrap/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fortawesome/fontawesome-free@6.5.2/css/all.min.css"
+              asp-fallback-href="~/plugins/fontawesome/css/all.min.css"
+              asp-fallback-test-class="fa" asp-fallback-test-property="font-family" asp-fallback-test-value="Font Awesome 6 Free" />
+        <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/bundle.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fortawesome/fontawesome-free@6.5.2/css/all.min.css"
+              asp-fallback-href="~/plugins/fontawesome/css/all.min.css"
+              asp-fallback-test-class="fa" asp-fallback-test-property="font-family" asp-fallback-test-value="Font Awesome 6 Free" />
+        <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    </environment>
+    @RenderSection("HeadCss", required: false)
+    <style>
+        @@media (max-width: 767.98px) {
+            .main-sidebar,
+            .sidebar-collapse .main-sidebar { transform: translateX(-100%); }
+            .main-sidebar.sidebar-open { transform: translateX(0); z-index: 1040; box-shadow: 4px 0 12px rgba(0,0,0,.2); }
+            .sidebar-overlay {
+                display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:1039;
+            }
+            .sidebar-overlay.show { display:block; }
+            .content-wrapper, .main-header, .main-footer { margin-left: 0 !important; }
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<script>
+    try { if (sessionStorage.getItem('sidebarCollapsed') === '1' && window.innerWidth >= 768) document.body.classList.add('sidebar-collapse'); } catch (ex) { }
+</script>
+<div class="wrapper">
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light border-bottom">
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="#" id="sidebarToggler" role="button" aria-label="Toggle sidebar"><i class="fas fa-bars"></i></a></li>
+            <li class="nav-item d-none d-sm-inline-block"><a href="/admin/dashboard" class="nav-link">Dashboard</a></li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="far fa-user-circle mr-1"></i>@displayName <span class="badge badge-info ml-1">@roleStr</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <a href="/admin/update-password" class="dropdown-item"><i class="fas fa-key mr-2"></i>Change Password</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/admin/logout" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="main-sidebar sidebar-dark-primary elevation-4" id="mainSidebar">
+        <a href="/admin/dashboard" class="brand-link text-center">
+            <i class="fas fa-graduation-cap brand-logo"></i><span class="brand-text font-weight-bold text-light">ExamSystem</span>
+        </a>
+        <div class="sidebar">
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column">
+                    <li class="nav-item">
+                        <a href="/admin/dashboard" title="Dashboard" class="nav-link @(IsNavActive("dashboard") ? "active" : "")" aria-current="@NavCurrent("dashboard")">
+                            <i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/admin-user/index" title="Admin Users" class="nav-link @(IsNavActive("admin-user") ? "active" : "")" aria-current="@NavCurrent("admin-user")">
+                            <i class="nav-icon fas fa-users-cog"></i><p>Admin Users</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/grade/index" title="Grades" class="nav-link @(IsNavActive("grade") ? "active" : "")" aria-current="@NavCurrent("grade")">
+                            <i class="nav-icon fas fa-layer-group"></i><p>Grades</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/subject/index" title="Subjects" class="nav-link @(IsNavActive("subject") ? "active" : "")" aria-current="@NavCurrent("subject")">
+                            <i class="nav-icon fas fa-book"></i><p>Subjects</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/question/index" title="Question Bank" class="nav-link @(IsNavActive("question") ? "active" : "")" aria-current="@NavCurrent("question")">
+                            <i class="nav-icon fas fa-question-circle"></i><p>Question Bank</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/marking-rule/index" title="Marking Rules" class="nav-link @(IsNavActive("marking-rule") ? "active" : "")" aria-current="@NavCurrent("marking-rule")">
+                            <i class="nav-icon fas fa-clipboard-check"></i><p>Marking Rules</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/exam/index" title="Exams" class="nav-link @(IsNavActive("exam") ? "active" : "")" aria-current="@NavCurrent("exam")">
+                            <i class="nav-icon fas fa-file-alt"></i><p>Exams</p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row align-items-center mb-3">
+                    <div class="col-sm-8">
+                        <h1 class="m-0 text-dark h4">@headerTitle</h1>
+                    </div>
+                    <div class="col-sm-4 text-sm-right mt-2 mt-sm-0">
+                        @RenderSection("Toolbar", required: false)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    <footer class="main-footer text-sm text-muted">
+        <strong>&copy; @DateTime.Now.Year ExamSystem</strong> — All rights reserved.
+    </footer>
+</div>
+
+@if (TempData["ShowToast"] != null && (bool)TempData["ShowToast"])
+{
+    var toastIcon = TempData["ToastIcon"] as string ?? "fa-check-circle text-success";
+    <div class="toast-container" style="position:fixed;top:1rem;right:1rem;z-index:1080;" aria-live="polite" aria-atomic="true">
+        <div class="toast shadow" role="status" data-delay="@(toastIcon.Contains("text-danger") ? "8000" : "4000")">
+            <div class="toast-header">
+                <i class="fas @toastIcon mr-2"></i>
+                <strong class="mr-auto">@TempData["ToastTitle"]</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="toast-body">@TempData["ToastMessage"]</div>
+        </div>
+    </div>
+}
+
+<environment include="Development">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
+            asp-fallback-src="~/plugins/jquery/jquery.min.js"
+            asp-fallback-test="window.jQuery" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+            asp-fallback-src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"
+            asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+</environment>
+<environment exclude="Development">
+    <script src="~/js/bundle.min.js" asp-append-version="true"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+</environment>
+<script>
+    $(function () {
+        $('.toast').toast('show');
+        var sb = document.getElementById('mainSidebar');
+        var ov = document.getElementById('sidebarOverlay');
+        var tg = document.getElementById('sidebarToggler');
+        function isMobile() { return window.innerWidth < 768; }
+        function closeMenu() { sb.classList.remove('sidebar-open'); ov.classList.remove('show'); }
+        if (tg) {
+            tg.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (isMobile()) { sb.classList.toggle('sidebar-open'); ov.classList.toggle('show'); }
+                else {
+                    var collapsed = document.body.classList.toggle('sidebar-collapse');
+                    try { sessionStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0'); } catch (ex) { }
+                }
+            });
+        }
+        if (ov) ov.addEventListener('click', closeMenu);
+        document.querySelectorAll('#mainSidebar a.nav-link').forEach(function (a) { a.addEventListener('click', closeMenu); });
+    });
+</script>
+@RenderSection("Scripts", required: false)
+</body>
+</html>

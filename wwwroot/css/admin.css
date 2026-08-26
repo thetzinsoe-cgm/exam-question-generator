@@ -1,0 +1,42 @@
+/* AdminLTE layout additions */
+.main-sidebar { top: 0; left: 0; width: 250px; position: fixed; height: 100vh; overflow-y: auto; overflow-x: hidden; background: #343a40; color:#fff; transform: translateX(0); transition: transform .25s ease, width .25s ease; white-space: nowrap; }
+.main-sidebar a { color: #c2c7d0; }
+.main-sidebar .nav-sidebar > .nav-item > .nav-link.active,
+.main-sidebar .nav-sidebar > .nav-item > .nav-link:focus,
+.main-sidebar .nav-sidebar > .nav-item > .nav-link:hover {
+    color: #fff; background-color: #007bff;
+}
+.content-wrapper { margin-left: 250px; min-height: calc(100vh - 62px); transition: margin-left .25s ease; }
+.main-header { margin-left: 250px; min-height: 57px; transition: margin-left .25s ease; }
+.main-footer { margin-left: 250px; padding: 10px; background: #fff; border-top: 1px solid #dee2e6; transition: margin-left .25s ease; }
+
+.brand-link { display:flex; align-items:center; justify-content:center; height:57px; padding:0 10px; font-size:1.25rem; line-height:1.5; color:#fff; }
+.brand-link:hover, .brand-link:focus { color: rgba(255,255,255,.85); text-decoration: none; }
+.brand-logo { font-size: 1.35rem; }
+.brand-text { margin-left: 10px; }
+.sidebar a.nav-link { padding: 8px 12px; display: flex; align-items: center; font-size: 14px; min-height: 44px; transition: background-color .2s ease, color .2s ease; }
+.sidebar a.nav-link p { margin: 0; }
+.sidebar .nav-icon { width: 24px; display:inline-block; text-align:center; margin-right: 4px; }
+.nav-treeview { padding-left: 10px; list-style: none; }
+
+.dropdown-menu .dropdown-item { padding-top: .55rem; padding-bottom: .55rem; }
+
+@media (min-width: 768px) {
+    .sidebar-collapse .main-sidebar { width: 70px; }
+    .sidebar-collapse .brand-text { display: none; }
+    .sidebar-collapse .brand-logo { margin-left: 0; }
+    .sidebar-collapse .sidebar a.nav-link { justify-content: center; padding-left: 0; padding-right: 0; }
+    .sidebar-collapse .sidebar a.nav-link p { display: none; }
+    .sidebar-collapse .sidebar .nav-icon { width: 100%; margin-right: 0; text-align: center; font-size: 1.15rem; }
+    .sidebar-collapse .content-wrapper,
+    .sidebar-collapse .main-header,
+    .sidebar-collapse .main-footer { margin-left: 70px !important; }
+}
+
+.badge-pill { padding: 4px 8px; }
+.font-mono { font-family: Consolas, Monaco, monospace; }
+
+.main-sidebar a:hover, .main-sidebar a:focus,
+.navbar a:hover, .dropdown-menu .dropdown-item:hover,
+.small-box > .small-box-footer:hover,
+a.btn:hover, a.btn:focus { text-decoration: none; }

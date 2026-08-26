@@ -1,0 +1,81 @@
+@using ExamSystem.ViewModels.MarkingRule
+@model MarkingRuleIndexViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Marking Rules";
+    ViewData["HeaderTitle"] = "Marking Rules";
+}
+@section Toolbar {
+    <a href="/admin/marking-rule/create" class="btn btn-primary"><i class="fas fa-plus mr-1"></i>Add Rule</a>
+}
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row mb-3">
+            <div class="col-md-3">
+                @{
+                    var subjects = ViewBag.Subjects as System.Collections.IEnumerable;
+                }
+                <select name="subject_id" class="form-control">
+                    <option value="" selected="@(Model.Filter.subject_id == null)">All Subjects</option>
+                    @if (subjects != null)
+                    {
+                        foreach (var s in System.Linq.Enumerable.Cast<dynamic>(subjects))
+                        {
+                            <option value="@s.id" selected="@(Model.Filter.subject_id == s.id)">@s.name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="question_type" class="form-control">
+                    <option value="" selected="@(Model.Filter.question_type == null)">All Types</option>
+                    @{
+                        var qt = ViewBag.QuestionTypes as System.Collections.IEnumerable;
+                        if (qt != null)
+                        {
+                            foreach (var t in System.Linq.Enumerable.Cast<dynamic>(qt))
+                            {
+                                <option value="@t.id" selected="@(Model.Filter.question_type == t.id)">@t.name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">@Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", onchange = "$(this).closest('form').submit()" })</div>
+            <div class="col-md-5 text-right">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                <a href="/admin/marking-rule/index" class="btn btn-default"><i class="fas fa-redo"></i></a>
+            </div>
+        </form>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Id</th><th>Subject</th><th>Question Type</th><th>Marks/Q</th><th>-ve Marks</th>
+                    <th>Min Qs</th><th>Max Qs</th><th>Difficulty</th><th>Status</th>
+                    <th class="text-center" style="width:160px">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Response.Data != null && Model.Response.Data.Any())
+                {
+                    foreach (var r in Model.Response.Data)
+                    {
+                        <tr>
+                            <td>@r.id</td><td>@r.subject_name</td><td>@r.question_type_name</td>
+                            <td>@r.marks_per_question</td><td>@r.negative_marks</td>
+                            <td>@r.min_questions</td><td>@r.max_questions</td>
+                            <td>@(r.difficulty == 1 ? "Easy" : r.difficulty == 2 ? "Medium" : "Hard")</td>
+                            <td>@if (r.is_active) { <span class="badge badge-success">Active</span> } else { <span class="badge badge-danger">Inactive</span> }</td>
+                            <td class="text-center">
+                                <a href="/admin/marking-rule/edit/@r.id?listingPageUrl=@Context.Request.Path@Context.Request.QueryString" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="/admin/marking-rule/delete/@r.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-danger" onclick="return confirm('Delete this rule?')"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else { <tr><td colspan="10" class="text-center text-muted">No rules found.</td></tr> }
+            </tbody>
+        </table>
+        @Html.Partial("_PaginationPartial")
+    </div>
+</div>

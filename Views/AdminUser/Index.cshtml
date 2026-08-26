@@ -1,0 +1,83 @@
+@using ExamSystem.ViewModels.AdminUser
+@model AdminUserIndexViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Users";
+    ViewData["HeaderTitle"] = "Admin Users";
+}
+@section Toolbar {
+    <a href="/admin/admin-user/create" class="btn btn-primary"><i class="fas fa-user-plus mr-1"></i>Add Admin</a>
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row mb-3">
+            <div class="col-md-3"><input type="text" name="search" value="@Model.Filter.search" class="form-control" placeholder="Search..." /></div>
+            <div class="col-md-2">
+                <select name="role" class="form-control">
+                    <option value="" selected="@(Model.Filter.role == null)">All Roles</option>
+                    <option value="1" selected="@(Model.Filter.role == 1)">Super Admin</option>
+                    <option value="2" selected="@(Model.Filter.role == 2)">Admin</option>
+                    <option value="3" selected="@(Model.Filter.role == 3)">Teacher</option>
+                    <option value="4" selected="@(Model.Filter.role == 4)">Examiner</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="is_active" class="form-control">
+                    <option value="" selected="@(Model.Filter.is_active == null)">All Status</option>
+                    <option value="1" selected="@(Model.Filter.is_active == true)">Active</option>
+                    <option value="0" selected="@(Model.Filter.is_active == false)">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">@Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", onchange = "$(this).closest('form').submit()" })</div>
+            <div class="col-md-3 text-right">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                <a href="/admin/admin-user/index" class="btn btn-default"><i class="fas fa-redo"></i> Reset</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th style="width: 160px" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Response.Data != null && Model.Response.Data.Any())
+                    {
+                        foreach (var u in Model.Response.Data)
+                        {
+                            <tr>
+                                <td>@u.id</td>
+                                <td>@u.username</td>
+                                <td>@u.full_name</td>
+                                <td>@u.email</td>
+                                <td><span class="badge badge-info">@u.role_name</span></td>
+                                <td>
+                                    @if (u.is_active) { <span class="badge badge-success">Active</span> }
+                                    else { <span class="badge badge-danger">Inactive</span> }
+                                </td>
+                                <td>@u.created_datetime.ToString("yyyy-MM-dd")</td>
+                                <td class="text-center">
+                                    <a href="/admin/admin-user/edit/@u.id?listingPageUrl=@Context.Request.Path@Context.Request.QueryString" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                    <a href="/admin/admin-user/delete/@u.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else { <tr><td colspan="8" class="text-center text-muted">No records found.</td></tr> }
+                </tbody>
+            </table>
+        </div>
+
+        @Html.Partial("_PaginationPartial", new { totalItems = Model.Response.TotalItems, totalPages = Model.Response.TotalPages, pageNumber = Model.Filter.page_number, pageSize = Model.Filter.page_size })
+    </div>
+</div>
