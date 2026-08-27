@@ -106,6 +106,42 @@ namespace ExamSystem.Controllers.Admin
             return View("~/Views/Exam/Preview.cshtml", resp.Data as ExamResponseDto);
         }
 
+        [HttpGet("exam/edit/{id}")]
+        public async Task<IActionResult> Edit(long id)
+        {
+            ViewBag.FormTitle = "Edit Exam";
+            var resp = await _service.GetExamAsync(id);
+            if (resp.Errors != null) return NotFound();
+            await LoadViewBags();
+            var subjectResp = await _subjectService.GetByGradeIdAsync(((ExamResponseDto)resp.Data).grade_id);
+            ViewBag.Subjects = subjectResp.Data;
+            return View("~/Views/Exam/Edit.cshtml", resp.Data as ExamResponseDto);
+        }
+
+        [HttpPost("exam/edit/{id}")]
+        public async Task<IActionResult> Edit(long id, ExamResponseDto input, string listingPageUrl)
+        {
+            ViewBag.FormTitle = "Edit Exam";
+            var resp = await _service.UpdateExamAsync(id, input);
+            if (!resp.IsSuccess)
+            {
+                if (resp.Errors != null)
+                {
+                    if (resp.Errors.InvalidParams != null && resp.Errors.InvalidParams.Any())
+                    {
+                        resp.Errors.InvalidParams.AddAuthLog();
+                        ModelState.AddModelErrors(resp.Errors.InvalidParams);
+                    }
+                    else ErrorMessage(resp.Errors.Detail);
+                }
+                await LoadViewBags();
+                ViewBag.Subjects = (await _subjectService.GetByGradeIdAsync(input.grade_id)).Data;
+                return View("~/Views/Exam/Edit.cshtml", input);
+            }
+            SuccessMessage("Exam updated successfully.");
+            return !string.IsNullOrWhiteSpace(listingPageUrl) ? Redirect(listingPageUrl) : RedirectToAction("Index");
+        }
+
         [HttpGet("exam/delete/{id}")]
         public async Task<IActionResult> Delete(long id, int page_number = 1)
         {
@@ -178,7 +214,7 @@ img{max-width:100%;height:auto;margin:6px 0}
             sb.Append("<div class='meta'>");
             sb.Append("<span>Exam Code: <b>").Append(System.Net.WebUtility.HtmlEncode(exam?.exam_code)).Append("</b></span>");
             sb.Append("<span>Subject: <b>").Append(System.Net.WebUtility.HtmlEncode(exam?.subject_name)).Append("</b> | Grade: <b>").Append(System.Net.WebUtility.HtmlEncode(exam?.grade_name)).Append("</b></span>");
-            sb.Append("<span>Duration: <b>").Append(exam?.duration_minutes.ToString()).Append(" min</b> | Marks: <b>").Append(exam?.total_marks.ToString()).Append("</b></span>");
+            sb.Append("<span>Duration: <b>").Append(exam?.duration_minutes.ToString()).Append(" min</b> | Marks: <b>").Append(exam?.total_marks.ToString("0.##")).Append("</b></span>");
             sb.Append("</div>");
             sb.Append("<p>").Append(System.Net.WebUtility.HtmlEncode(exam?.description)).Append("</p>");
             sb.Append("<div id='questions'>");
@@ -189,7 +225,7 @@ img{max-width:100%;height:auto;margin:6px 0}
                 var q = questions[i];
                 var qNum = (i + 1).ToString();
                 sb.Append("<div class='q'>");
-                sb.Append("<span class='qn'>").Append(qNum).Append(".</span> (").Append(q.marks_allocated.ToString()).Append(" marks) ").Append(System.Net.WebUtility.HtmlEncode(q.question_type_name));
+                sb.Append("<span class='qn'>").Append(qNum).Append(".</span> (").Append(q.marks_allocated.ToString("0.##")).Append(" marks) ").Append(System.Net.WebUtility.HtmlEncode(q.question_type_name));
                 sb.Append("<div style='margin-left:22px'>");
                 if (!string.IsNullOrWhiteSpace(q.image_url))
                     sb.Append("<img src='").Append(System.Net.WebUtility.HtmlEncode(q.image_url)).Append("' alt=''/>");

@@ -1,24 +1,25 @@
-@model ExamSystem.DTOs.Subject.SubjectResponseDto
+@model ExamSystem.DTOs.Exam.ExamResponseDto
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = (ViewBag.FormTitle ?? "Edit") + " Subject";
-    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Edit Subject";
-    var listingPageUrl = Context.Request.Query["listingPageUrl"].FirstOrDefault() ?? "/admin/subject/index";
+    ViewData["Title"] = (ViewBag.FormTitle ?? "Edit") + " Exam";
+    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Edit Exam";
+    var listingPageUrl = Context.Request.Query["listingPageUrl"].FirstOrDefault() ?? "/admin/exam/index";
     var grades = ViewBag.Grades as System.Collections.IEnumerable ?? new object[0];
+    var subjectList = ViewBag.Subjects as System.Collections.IEnumerable ?? new object[0];
 }
 <div class="row justify-content-center">
     <div class="col-md-9 col-xl-8">
         <div class="card shadow-sm">
             <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold"><i class="fas fa-edit mr-2 text-primary"></i>Edit Subject</h6>
-                <span class="badge badge-light border text-muted font-mono">Code: @Model.code</span>
+                <h6 class="m-0 font-weight-bold"><i class="fas fa-edit mr-2 text-primary"></i>Edit Exam</h6>
+                <span class="badge badge-light border text-muted font-mono">Code: @Model.exam_code</span>
             </div>
             <div class="card-body">
                 <form asp-action="Edit" method="post" class="row g-3">
                     <input type="hidden" name="listingPageUrl" value="@listingPageUrl" />
                     <div class="form-group col-md-6">
                         <label>Grade / Level <span class="text-danger">*</span></label>
-                        <select name="grade_id" class="form-control" required>
+                        <select name="grade_id" id="gradeSelect" class="form-control" required>
                             @foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
                             {
                                 <option value="@g.id" selected="@(Model.grade_id == g.id)">@g.name</option>
@@ -26,28 +27,33 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Subject Code <span class="text-danger">*</span></label>
-                        <input type="text" name="code" value="@Model.code" class="form-control font-mono" required maxlength="50" />
+                        <label>Subject <span class="text-danger">*</span></label>
+                        <select name="subject_id" id="subjectSelect" class="form-control" required>
+                            @foreach (var s in System.Linq.Enumerable.Cast<dynamic>(subjectList))
+                            {
+                                <option value="@s.id" selected="@(Model.subject_id == s.id)">@s.name</option>
+                            }
+                        </select>
                     </div>
                     <div class="form-group col-12">
-                        <label>Subject Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" value="@Model.name" class="form-control" required maxlength="255" />
+                        <label>Exam Title <span class="text-danger">*</span></label>
+                        <input type="text" name="title" value="@Model.title" class="form-control" required maxlength="255" />
                     </div>
                     <div class="form-group col-12">
-                        <label>Description / Curriculum</label>
+                        <label>Description</label>
                         <textarea name="description" class="form-control" rows="3" maxlength="500">@Model.description</textarea>
                     </div>
                     <div class="form-group col-md-4">
-                        <label>Total Marks <span class="text-danger">*</span></label>
-                        <input type="number" step="0.01" min="0" name="total_marks" value="@Model.total_marks" class="form-control" required />
+                        <label>Duration (minutes) <span class="text-danger">*</span></label>
+                        <input type="number" min="1" name="duration_minutes" value="@Model.duration_minutes" class="form-control" required />
                     </div>
                     <div class="form-group col-md-4">
                         <label>Pass Marks</label>
                         <input type="number" step="0.01" min="0" name="pass_marks" value="@Model.pass_marks" class="form-control" />
                     </div>
                     <div class="form-group col-md-4">
-                        <label>Duration (minutes)</label>
-                        <input type="number" min="0" name="duration_minutes" value="@Model.duration_minutes" class="form-control" />
+                        <label>Exam Date</label>
+                        <input type="date" name="exam_date" value="@Model.exam_date?.ToString("yyyy-MM-dd")" class="form-control" />
                     </div>
                     <div class="form-group col-md-6 align-self-end pb-2">
                         <div class="custom-control custom-checkbox">
@@ -55,8 +61,11 @@
                             <label class="custom-control-label" for="isActive"><strong>Active Status</strong></label>
                         </div>
                     </div>
+                    <div class="form-group col-md-6 text-right align-self-end pb-2">
+                        <small class="text-muted">Total Marks: <strong>@Model.total_marks.ToString("0.##")</strong> | Questions: <strong>@Model.total_questions</strong></small>
+                    </div>
                     <div class="col-12 pt-3 border-top">
-                        <button type="submit" class="btn btn-primary px-4" id="saveBtn"><i class="fas fa-save mr-1"></i>Update Subject</button>
+                        <button type="submit" class="btn btn-primary px-4" id="saveBtn"><i class="fas fa-save mr-1"></i>Update Exam</button>
                         <a href="@listingPageUrl" class="btn btn-outline-secondary px-4 ml-1">Cancel</a>
                         <div asp-validation-summary="All" class="text-danger mt-3"></div>
                     </div>
@@ -69,6 +78,15 @@
 @section Scripts {
 <script>
     $(function () {
+        $('#gradeSelect').change(function () {
+            var gid = $(this).val();
+            $.getJSON('/admin/exam/subjects-by-grade?grade_id=' + gid, function (data) {
+                var list = data.data || data || [];
+                var sel = $('#subjectSelect').empty();
+                list.forEach(function (s) { sel.append($('<option>', { value: s.id, text: s.name })); });
+            }).fail(function () { console.error('Failed to load subjects by grade.'); });
+        });
+
         $('form').on('submit', function () {
             var btn = $('#saveBtn');
             btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Saving...');

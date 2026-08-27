@@ -10,14 +10,18 @@
 }
 <div class="card">
     <div class="card-body">
-        <form asp-action="Index" method="get" class="row mb-3">
-            <div class="col-md-3"><input type="text" name="search" value="@Model.Filter.search" class="form-control" placeholder="Search name/code..." /></div>
-            <div class="col-md-3">
+        <form asp-action="Index" method="get" class="row mb-3 align-items-end">
+            <div class="col-md-3 mb-2">
+                <label for="subjectSearch" class="sr-only">Search subjects</label>
+                <input type="text" id="subjectSearch" name="search" value="@Model.Filter.search" class="form-control" placeholder="Search name or code..." />
+            </div>
+            <div class="col-md-3 mb-2">
+                <label for="gradeFilter" class="sr-only">Filter by grade</label>
                 @{
                     var grades = ViewBag.Grades as System.Collections.IEnumerable;
                     var sel = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(System.Linq.Enumerable.Cast<object>(grades ?? new object[0]), "id", "name");
                 }
-                <select name="grade_id" id="grade_id" class="form-control">
+                <select name="grade_id" id="gradeFilter" class="form-control">
                     <option value="" selected="@(Model.Filter.grade_id == null)">All Grades</option>
                     @if (grades != null)
                     {
@@ -28,15 +32,25 @@
                     }
                 </select>
             </div>
-            <div class="col-md-2">@Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", onchange = "$(this).closest('form').submit()" })</div>
-            <div class="col-md-4 text-right">
-                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
-                <a href="/admin/subject/index" class="btn btn-default"><i class="fas fa-redo"></i> Reset</a>
+            <div class="col-md-2 mb-2">
+                <label for="pageSize" class="sr-only">Page size</label>
+                @Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", id = "pageSize", onchange = "$(this).closest('form').submit()" })
+            </div>
+            <div class="col-md-4 mb-2 text-right">
+                <button class="btn btn-primary" type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+                <a href="/admin/subject/index" class="btn btn-outline-secondary" aria-label="Reset filters"><i class="fas fa-redo"></i> Reset</a>
             </div>
         </form>
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead><tr><th>Id</th><th>Code</th><th>Name</th><th>Grade</th><th>Total Marks</th><th>Pass Marks</th><th>Duration</th><th>Q#Count</th><th>Status</th><th class="text-center" style="width:160px">Action</th></tr></thead>
+            <table class="table table-bordered table-striped table-hover align-middle mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Id</th><th>Code</th><th>Name</th><th>Grade</th>
+                        <th class="text-right">Total Marks</th><th class="text-right">Pass Marks</th>
+                        <th class="text-right">Duration</th><th class="text-center">Q#Count</th>
+                        <th>Status</th><th class="text-center" style="width:120px">Action</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @if (Model.Response.Data != null && Model.Response.Data.Any())
                     {
@@ -45,17 +59,28 @@
                             <tr>
                                 <td>@s.id</td><td><code>@s.code</code></td><td>@s.name</td>
                                 <td>@s.grade_name</td>
-                                <td>@s.total_marks</td><td>@s.pass_marks</td><td>@s.duration_minutes min</td>
-                                <td><span class="badge badge-pill badge-info">@s.question_count</span></td>
+                                <td class="text-right font-weight-bold">@s.total_marks</td>
+                                <td class="text-right font-weight-bold">@s.pass_marks</td>
+                                <td class="text-right">@s.duration_minutes <small class="text-muted">min</small></td>
+                                <td class="text-center"><span class="badge badge-pill badge-info">@s.question_count</span></td>
                                 <td>@if (s.is_active) { <span class="badge badge-success">Active</span> } else { <span class="badge badge-danger">Inactive</span> }</td>
                                 <td class="text-center">
-                                    <a href="/admin/subject/edit/@s.id?listingPageUrl=@Context.Request.Path@Context.Request.QueryString" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                    <a href="/admin/subject/delete/@s.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-danger" onclick="return confirm('Delete this subject?')"><i class="fas fa-trash"></i></a>
+                                    <a href="/admin/subject/edit/@s.id?listingPageUrl=@Context.Request.Path@Context.Request.QueryString" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a href="/admin/subject/delete/@s.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this subject?')"><i class="fas fa-trash"></i></a>
                                 </td>
                             </tr>
                         }
                     }
-                    else { <tr><td colspan="10" class="text-center text-muted">No subjects found.</td></tr> }
+                    else {
+                        <tr>
+                            <td colspan="10" class="text-center text-muted py-5">
+                                <i class="fas fa-book fa-3x mb-3 d-block text-muted"></i>
+                                <p class="mb-2 font-weight-bold">No subjects found</p>
+                                <p class="mb-3 small">Add a subject to start creating exams and questions.</p>
+                                <a href="/admin/subject/create" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i>Add Subject</a>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>

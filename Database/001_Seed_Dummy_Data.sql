@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- ExamSystem Database - Dummy Data Seed Script
 -- Target: MariaDB / MySQL (Port 3308, Database: exam_system)
 -- Generated: 2026-08-20
@@ -11,50 +11,48 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ------------------------------------------------------------
--- TABLE: m_admin_user
+-- TABLE: m_admin_users
 -- Roles: 1=SuperAdmin, 2=Admin, 3=Teacher, 4=Examiner
 -- Password for ALL users: Admin@123
--- BCrypt hash for "Admin@123": $2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR
--- Note: Replace hash values with real BCrypt hashes in production.
--- Using a placeholder hash valid for demo: $2a$11$000000000000000000000000000000000000000000000000000
--- For a real quick test, use: $2a$11$xYh8KJq5sLm1vN2pQ3rS4u.abcdefghijklmnopqrstuvwxyz01
+-- BCrypt hash for "Admin@123" (work factor 11, verified):
+--   $2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii
 -- ------------------------------------------------------------
-TRUNCATE TABLE m_admin_user;
+TRUNCATE TABLE m_admin_users;
 
-INSERT INTO m_admin_user
+INSERT INTO m_admin_users
 (id, username, email, password_hash, full_name, phone, profile_image, role, is_active, is_deleted,
  password_reset_token, password_reset_expiry, created_user_id, updated_user_id, created_datetime, updated_datetime)
 VALUES
-(1, 'superadmin', 'superadmin@examsystem.com', '$2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR',
+(1, 'superadmin', 'superadmin@examsystem.com', '$2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii',
  'Super Administrator', '09111111111', NULL, 1, 1, 0, NULL, NULL, NULL, NULL, NOW(), NULL),
 
-(2, 'admin', 'admin@examsystem.com', '$2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR',
+(2, 'admin', 'admin@examsystem.com', '$2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii',
  'System Admin', '09222222222', NULL, 2, 1, 0, NULL, NULL, 1, 1, NOW(), NULL),
 
-(3, 'teacher_math', 'teacher.math@examsystem.com', '$2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR',
+(3, 'teacher_math', 'teacher.math@examsystem.com', '$2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii',
  'Daw Khin Mar Yee', '09333333333', NULL, 3, 1, 0, NULL, NULL, 1, 1, NOW(), NULL),
 
-(4, 'teacher_science', 'teacher.science@examsystem.com', '$2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR',
+(4, 'teacher_science', 'teacher.science@examsystem.com', '$2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii',
  'U Min Thant', '09444444444', NULL, 3, 1, 0, NULL, NULL, 1, 1, NOW(), NULL),
 
-(5, 'teacher_english', 'teacher.english@examsystem.com', '$2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR',
+(5, 'teacher_english', 'teacher.english@examsystem.com', '$2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii',
  'Daw Cho Cho Win', '09555555555', NULL, 3, 1, 0, NULL, NULL, 1, 1, NOW(), NULL),
 
-(6, 'teacher_history', 'teacher.history@examsystem.com', '$2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR',
+(6, 'teacher_history', 'teacher.history@examsystem.com', '$2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii',
  'U Kyaw Soe', '09666666666', NULL, 3, 1, 0, NULL, NULL, 1, 1, NOW(), NULL),
 
-(7, 'examiner1', 'examiner1@examsystem.com', '$2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR',
+(7, 'examiner1', 'examiner1@examsystem.com', '$2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii',
  'Examiner - Aye Aye', '09777777777', NULL, 4, 1, 0, NULL, NULL, 1, 1, NOW(), NULL),
 
-(8, 'examiner2', 'examiner2@examsystem.com', '$2a$11$xYh8KJq5sLm1vN2pQ3rS4uO5wX6yZ7aB8cD9eF0gH1iJ2kL3mN4oP5qR',
+(8, 'examiner2', 'examiner2@examsystem.com', '$2a$11$Y6bQaFtgrCTD4KL6fTF6juWXr1bsmyynsm/OlF4ZPg2Qbj.6BhCii',
  'Examiner - Bo Bo', '09888888888', NULL, 4, 1, 0, NULL, NULL, 1, 1, NOW(), NULL);
 
 -- ------------------------------------------------------------
--- TABLE: m_grade (Grades / Levels)
+-- TABLE: m_grades (Grades / Levels)
 -- ------------------------------------------------------------
-TRUNCATE TABLE m_grade;
+TRUNCATE TABLE m_grades;
 
-INSERT INTO m_grade
+INSERT INTO m_grades
 (id, name, level, description, sort_order, is_active, is_deleted, created_user_id, updated_user_id, created_datetime, updated_datetime)
 VALUES
 (1, 'Grade 5',   'Primary',     'Primary School - Standard 5',         1, 1, 0, 1, NULL, NOW(), NULL),
@@ -68,11 +66,11 @@ VALUES
 (9, 'TOEFL',     'Language',    'Test of English as Foreign Language', 9, 1, 0, 1, NULL, NOW(), NULL);
 
 -- ------------------------------------------------------------
--- TABLE: m_subject (Subjects under each Grade)
+-- TABLE: m_subjects (Subjects under each Grade)
 -- ------------------------------------------------------------
-TRUNCATE TABLE m_subject;
+TRUNCATE TABLE m_subjects;
 
-INSERT INTO m_subject
+INSERT INTO m_subjects
 (id, grade_id, name, code, description, total_marks, pass_marks, duration_minutes, is_active, is_deleted,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
 VALUES
@@ -108,17 +106,17 @@ VALUES
 (23, 8, 'IELTS Writing',     'IELTS-W',  'IELTS Writing Module',                     40,  20, 60,  1, 0, 1, NULL, NOW(), NULL);
 
 -- ------------------------------------------------------------
--- TABLE: m_question (Question Bank)
+-- TABLE: m_questions (Question Bank)
 -- Question Types: 1=MCQ, 2=TrueFalse, 3=ShortAnswer, 4=Essay,
 --                 5=MathExpr, 6=BIO(with image), 7=ECO_Calc, 8=FillBlank
 -- Difficulty: 1=Easy, 2=Medium, 3=Hard
 -- ------------------------------------------------------------
-TRUNCATE TABLE m_answer_option;
-TRUNCATE TABLE t_exam_question;
-TRUNCATE TABLE m_question;
+TRUNCATE TABLE m_answer_options;
+TRUNCATE TABLE t_exam_questions;
+TRUNCATE TABLE m_questions;
 
 -- ============== Grade 10 - Mathematics (subject_id=3) MCQs ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -131,26 +129,26 @@ VALUES
 
 (2,  3, 6, 1,
  'Simplify: (3^2) * (3^3) = ?',
- '<p>Simplify: <code>3<sup>2</sup> × 3<sup>3</sup></code> = ?</p>',
+ '<p>Simplify: <code>3<sup>2</sup> Ã— 3<sup>3</sup></code> = ?</p>',
  NULL, 'When multiplying same bases, add exponents.', '3^(2+3) = 3^5 = 243.',
  1, 1.0, 0.25, 1, 0, NULL, '["exponent","indices"]', 3, NULL, NOW(), NULL),
 
 (3,  3, 6, 1,
- 'What is the area of a circle with radius 7 cm? (Use π = 22/7)',
- '<p>What is the area of a circle with radius <strong>7 cm</strong>? (Use π = 22/7)</p>',
- NULL, 'Area = πr²', 'Area = (22/7) × 7 × 7 = 154 cm².',
+ 'What is the area of a circle with radius 7 cm? (Use Ï€ = 22/7)',
+ '<p>What is the area of a circle with radius <strong>7 cm</strong>? (Use Ï€ = 22/7)</p>',
+ NULL, 'Area = Ï€rÂ²', 'Area = (22/7) Ã— 7 Ã— 7 = 154 cmÂ².',
  2, 2.0, 0.5, 1, 0, NULL, '["geometry","circle","area"]', 3, NULL, NOW(), NULL),
 
 (4,  3, 6, 1,
- 'If sin θ = 3/5, what is cos θ? (θ is acute)',
- '<p>If <code>sin θ = 3/5</code>, what is <code>cos θ</code>?</p>',
- NULL, 'Use sin²θ + cos²θ = 1', 'cos θ = 4/5',
+ 'If sin Î¸ = 3/5, what is cos Î¸? (Î¸ is acute)',
+ '<p>If <code>sin Î¸ = 3/5</code>, what is <code>cos Î¸</code>?</p>',
+ NULL, 'Use sinÂ²Î¸ + cosÂ²Î¸ = 1', 'cos Î¸ = 4/5',
  2, 2.0, 0.5, 1, 0, NULL, '["trigonometry","identity"]', 3, NULL, NOW(), NULL),
 
 (5,  3, 6, 1,
- 'Factorize: x² - 9',
- '<p>Factorize: <code>x² - 9</code></p>',
- NULL, 'Difference of two squares: a² - b² = (a-b)(a+b)', 'x² - 9 = (x-3)(x+3)',
+ 'Factorize: xÂ² - 9',
+ '<p>Factorize: <code>xÂ² - 9</code></p>',
+ NULL, 'Difference of two squares: aÂ² - bÂ² = (a-b)(a+b)', 'xÂ² - 9 = (x-3)(x+3)',
  1, 1.0, 0.25, 1, 0, NULL, '["algebra","factorization"]', 3, NULL, NOW(), NULL),
 
 (6,  3, 6, 2,
@@ -160,20 +158,20 @@ VALUES
  1, 1.0, 0.25, 1, 0, NULL, '["geometry","triangle"]', 3, NULL, NOW(), NULL),
 
 (7,  3, 6, 2,
- '√2 is an irrational number.',
- '<p><code>√2</code> is an irrational number.</p>',
- NULL, 'Irrational numbers cannot be expressed as simple fractions.', '√2 = 1.41421... non-terminating, non-repeating.',
+ 'âˆš2 is an irrational number.',
+ '<p><code>âˆš2</code> is an irrational number.</p>',
+ NULL, 'Irrational numbers cannot be expressed as simple fractions.', 'âˆš2 = 1.41421... non-terminating, non-repeating.',
  1, 1.0, 0.25, 1, 0, NULL, '["number-system"]', 3, NULL, NOW(), NULL),
 
 (8,  3, 6, 3,
  'Find the LCM of 12 and 18.',
  '<p>Find the <strong>LCM</strong> of 12 and 18.</p>',
- NULL, 'Use prime factorization: 12=2²·3, 18=2·3²', 'LCM = 2² × 3² = 36',
+ NULL, 'Use prime factorization: 12=2Â²Â·3, 18=2Â·3Â²', 'LCM = 2Â² Ã— 3Â² = 36',
  2, 3.0, 0.0, 1, 0, NULL, '["lcm","number-system"]', 3, NULL, NOW(), NULL),
 
 (9,  3, 6, 5,
- 'Solve the quadratic equation: x² - 5x + 6 = 0',
- '<p>Solve the quadratic equation: <strong>x² - 5x + 6 = 0</strong></p>
+ 'Solve the quadratic equation: xÂ² - 5x + 6 = 0',
+ '<p>Solve the quadratic equation: <strong>xÂ² - 5x + 6 = 0</strong></p>
   <p>Show your steps using the quadratic formula:
   $$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$</p>',
  NULL, 'Try factorization or use quadratic formula.', '(x-2)(x-3) = 0, so x = 2 or x = 3.',
@@ -186,7 +184,7 @@ VALUES
  2, 2.0, 0.5, 1, 0, NULL, '["coordinate-geometry","slope"]', 3, NULL, NOW(), NULL);
 
 -- ============== Grade 10 - English (subject_id=2) MCQs ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -234,7 +232,7 @@ VALUES
  3, 15.0, 0.0, 1, 0, NULL, '["writing","essay","descriptive"]', 5, NULL, NOW(), NULL);
 
 -- ============== Grade 10 - Physics (subject_id=5) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -242,18 +240,18 @@ VALUES
 (17, 5, 6, 1,
  'What is the SI unit of force?',
  '<p>What is the <strong>SI unit</strong> of force?</p>',
- NULL, 'Named after a famous scientist who described laws of motion.', 'Newton (N) = kg·m/s²',
+ NULL, 'Named after a famous scientist who described laws of motion.', 'Newton (N) = kgÂ·m/sÂ²',
  1, 1.0, 0.25, 1, 0, NULL, '["mechanics","units","basic"]', 4, NULL, NOW(), NULL),
 
 (18, 5, 6, 1,
- 'A car accelerates from rest at 2 m/s² for 10 s. What is its final velocity?',
- '<p>A car accelerates from rest at <strong>2 m/s²</strong> for <strong>10 s</strong>. What is its final velocity?</p>',
+ 'A car accelerates from rest at 2 m/sÂ² for 10 s. What is its final velocity?',
+ '<p>A car accelerates from rest at <strong>2 m/sÂ²</strong> for <strong>10 s</strong>. What is its final velocity?</p>',
  NULL, 'Use: v = u + at, where u=0 (from rest)', 'v = 0 + (2)(10) = 20 m/s',
  2, 2.0, 0.5, 1, 0, NULL, '["kinematics","equation-of-motion"]', 4, NULL, NOW(), NULL),
 
 (19, 5, 6, 1,
  'Which law states: F = ma?',
- '<p>Which law states: <code>F = m × a</code>?</p>',
+ '<p>Which law states: <code>F = m Ã— a</code>?</p>',
  NULL, "One of Newton's three laws.", "Newton's Second Law of Motion.",
  1, 1.0, 0.25, 1, 0, NULL, '["newton","mechanics"]', 4, NULL, NOW(), NULL),
 
@@ -264,7 +262,7 @@ VALUES
  1, 1.0, 0.25, 1, 0, NULL, '["waves","sound"]', 4, NULL, NOW(), NULL);
 
 -- ============== Grade 10 - Chemistry (subject_id=4) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -284,19 +282,19 @@ VALUES
 (23, 4, 6, 1,
  'What type of bond is formed between Na and Cl in NaCl?',
  '<p>What type of bond is formed between <strong>Na and Cl</strong> in NaCl?</p>',
- NULL, 'Metal + Non-metal typically form this bond type.', 'Ionic bond (Na⁺ and Cl⁻)',
+ NULL, 'Metal + Non-metal typically form this bond type.', 'Ionic bond (Naâº and Clâ»)',
  2, 2.0, 0.5, 1, 0, NULL, '["chemical-bond","ionic"]', 4, NULL, NOW(), NULL),
 
 (24, 4, 6, 3,
- 'Balance the equation: _H₂ + _O₂ → _H₂O',
+ 'Balance the equation: _Hâ‚‚ + _Oâ‚‚ â†’ _Hâ‚‚O',
  '<p>Balance the equation:
-  <blockquote>___ H<sub>2</sub> + ___ O<sub>2</sub> → ___ H<sub>2</sub>O</blockquote>
+  <blockquote>___ H<sub>2</sub> + ___ O<sub>2</sub> â†’ ___ H<sub>2</sub>O</blockquote>
   Write the coefficients separated by commas.</p>',
- NULL, 'Count H and O atoms on both sides.', '2, 1, 2 → 2H₂ + O₂ → 2H₂O',
+ NULL, 'Count H and O atoms on both sides.', '2, 1, 2 â†’ 2Hâ‚‚ + Oâ‚‚ â†’ 2Hâ‚‚O',
  2, 3.0, 0.0, 1, 0, NULL, '["stoichiometry","balancing"]', 4, NULL, NOW(), NULL);
 
 -- ============== Grade 10 - Biology (subject_id=6) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -321,7 +319,7 @@ VALUES
  2, 3.0, 0.5, 1, 0, NULL, '["anatomy","heart","circulatory","image"]', 4, NULL, NOW(), NULL);
 
 -- ============== Grade 10 - Economics (subject_id=9) ECO Calculation ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -338,14 +336,14 @@ VALUES
   </ul></p>
   <p>Calculate: (a) TC, (b) TR, (c) Profit</p>',
  NULL,
- 'TC = FC + (VC × Q) ; TR = P × Q ; Profit = TR - TC',
- '(a) TC = 2000 + (25×100) = 4,500<br>(b) TR = 50×100 = 5,000<br>(c) Profit = 5,000-4,500 = $500',
+ 'TC = FC + (VC Ã— Q) ; TR = P Ã— Q ; Profit = TR - TC',
+ '(a) TC = 2000 + (25Ã—100) = 4,500<br>(b) TR = 50Ã—100 = 5,000<br>(c) Profit = 5,000-4,500 = $500',
  2, 10.0, 0.0, 1, 0,
- '{"columns":["Particular","Formula","Value"],"rows":[["Total Cost","FC + (VC×Q)",4500],["Total Revenue","P × Q",5000],["Profit","TR - TC",500]]}',
+ '{"columns":["Particular","Formula","Value"],"rows":[["Total Cost","FC + (VCÃ—Q)",4500],["Total Revenue","P Ã— Q",5000],["Profit","TR - TC",500]]}',
  '["cost","revenue","profit","eco-table"]', 6, NULL, NOW(), NULL);
 
 -- ============== Grade 10 - History (subject_id=7) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -363,22 +361,22 @@ VALUES
  1, 1.0, 0.25, 1, 0, NULL, '["usa","president","leadership"]', 6, NULL, NOW(), NULL);
 
 -- ============== Grade 11 - Mathematics (subject_id=12) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
 VALUES
 (31, 12, 7, 1,
- 'Find dy/dx if y = x³ - 2x² + 5',
- '<p>Find <code>dy/dx</code> if <code>y = x³ - 2x² + 5</code>.</p>',
- NULL, 'Use power rule: d/dx(xⁿ) = n·xⁿ⁻¹', 'dy/dx = 3x² - 4x',
+ 'Find dy/dx if y = xÂ³ - 2xÂ² + 5',
+ '<p>Find <code>dy/dx</code> if <code>y = xÂ³ - 2xÂ² + 5</code>.</p>',
+ NULL, 'Use power rule: d/dx(xâ¿) = nÂ·xâ¿â»Â¹', 'dy/dx = 3xÂ² - 4x',
  2, 2.0, 0.5, 1, 0, NULL, '["calculus","differentiation","derivative"]', 3, NULL, NOW(), NULL),
 
 (32, 12, 7, 5,
- 'Evaluate: ∫(2x + 3) dx',
+ 'Evaluate: âˆ«(2x + 3) dx',
  '<p>Evaluate the indefinite integral:
   $$\\int (2x + 3) \\, dx$$</p>',
- NULL, 'Apply ∫xⁿ dx = xⁿ⁺¹/(n+1) + C', '∫(2x+3)dx = x² + 3x + C',
+ NULL, 'Apply âˆ«xâ¿ dx = xâ¿âºÂ¹/(n+1) + C', 'âˆ«(2x+3)dx = xÂ² + 3x + C',
  2, 5.0, 0.0, 1, 0, NULL, '["calculus","integration","indefinite","katex"]', 3, NULL, NOW(), NULL),
 
 (33, 12, 7, 1,
@@ -389,7 +387,7 @@ VALUES
  2, 2.0, 0.5, 1, 0, NULL, '["matrix","determinant"]', 3, NULL, NOW(), NULL);
 
 -- ============== IELTS - Reading (subject_id=22) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -406,7 +404,7 @@ VALUES
  2, 1.0, 0.0, 1, 0, NULL, '["ielts","reading","main-idea"]', 5, NULL, NOW(), NULL);
 
 -- ============== Grade 7 - Science (subject_id=20) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -420,11 +418,11 @@ VALUES
 (36, 20, 3, 2,
  'Water boils at 100 degrees Fahrenheit at sea level.',
  '<p><strong>True or False:</strong> Water boils at <em>100 degrees Fahrenheit</em> at sea level.</p>',
- NULL, 'Compare Celsius vs Fahrenheit boiling points.', 'False. Boiling point is 100°C or 212°F.',
+ NULL, 'Compare Celsius vs Fahrenheit boiling points.', 'False. Boiling point is 100Â°C or 212Â°F.',
  1, 1.0, 0.25, 1, 0, NULL, '["temperature","measurement"]', 4, NULL, NOW(), NULL);
 
 -- ============== Grade 10 - Geography (subject_id=8) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -449,7 +447,7 @@ VALUES
  1, 1.0, 0.0, 1, 0, NULL, '["river","fill-blank","geography"]', 6, NULL, NOW(), NULL);
 
 -- ============== Extra Grade 10 Math (Medium & Hard pool) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -457,7 +455,7 @@ VALUES
 (40, 3, 6, 1,
  'Solve: 2^(x+1) = 32. What is x?',
  '<p>Solve: <code>2<sup>(x+1)</sup> = 32</code>. What is x?</p>',
- NULL, 'Express both sides with same base: 32 = 2⁵', '2^(x+1)=2^5 → x+1=5 → x=4',
+ NULL, 'Express both sides with same base: 32 = 2âµ', '2^(x+1)=2^5 â†’ x+1=5 â†’ x=4',
  2, 2.0, 0.5, 1, 0, NULL, '["exponential","equation"]', 3, NULL, NOW(), NULL),
 
 (41, 3, 6, 1,
@@ -469,32 +467,32 @@ VALUES
 (42, 3, 6, 3,
  'Find the median of: 3, 7, 9, 4, 5, 8, 6.',
  '<p>Find the median of: <code>{3, 7, 9, 4, 5, 8, 6}</code></p>',
- NULL, 'Sort first, then pick middle value.', 'Sorted: [3,4,5,6,7,8,9] → Median = 6',
+ NULL, 'Sort first, then pick middle value.', 'Sorted: [3,4,5,6,7,8,9] â†’ Median = 6',
  2, 3.0, 0.0, 1, 0, NULL, '["statistics","median"]', 3, NULL, NOW(), NULL);
 
 -- ============== Grade 10 Myanmar (subject_id=1) ==============
-INSERT INTO m_question
+INSERT INTO m_questions
 (id, subject_id, grade_id, question_type, question_text, question_html, image_url, hint, explanation,
  difficulty, default_marks, negative_marks, is_active, is_deleted, eco_table_json, tags_json,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
 VALUES
 (43, 1, 6, 1,
- '"မြန်မာစာ၏ ဗျည်းအက္ခရာ အရေအတွက် မည်မျှရှိသနည်း။"',
- '<p><strong>မြန်မာစာ၏ ဗျည်းအက္ခရာ အရေအတွက်</strong> မည်မျှရှိသနည်း။</p>',
- NULL, 'က စ ဋ ဏ တ ထ ဒ ဓ န ပ ဖ ဗ ဘ မ ယ ရ လ ဝ သ ဟ ဠ အ - ရေတွက်ကြည့်ပါ။', '33 လုံး (က မှ အ ထိ)',
- 1, 1.0, 0.25, 1, 0, NULL, '["မြန်မာ","ဗျည်း","အခြေခံ"]', 3, NULL, NOW(), NULL),
+ '"á€™á€¼á€”á€ºá€™á€¬á€…á€¬á á€—á€»á€Šá€ºá€¸á€¡á€€á€¹á€á€›á€¬ á€¡á€›á€±á€¡á€á€½á€€á€º á€™á€Šá€ºá€™á€»á€¾á€›á€¾á€­á€žá€”á€Šá€ºá€¸á‹"',
+ '<p><strong>á€™á€¼á€”á€ºá€™á€¬á€…á€¬á á€—á€»á€Šá€ºá€¸á€¡á€€á€¹á€á€›á€¬ á€¡á€›á€±á€¡á€á€½á€€á€º</strong> á€™á€Šá€ºá€™á€»á€¾á€›á€¾á€­á€žá€”á€Šá€ºá€¸á‹</p>',
+ NULL, 'á€€ á€… á€‹ á€ á€ á€‘ á€’ á€“ á€” á€• á€– á€— á€˜ á€™ á€š á€› á€œ á€ á€ž á€Ÿ á€  á€¡ - á€›á€±á€á€½á€€á€ºá€€á€¼á€Šá€·á€ºá€•á€«á‹', '33 á€œá€¯á€¶á€¸ (á€€ á€™á€¾ á€¡ á€‘á€­)',
+ 1, 1.0, 0.25, 1, 0, NULL, '["á€™á€¼á€”á€ºá€™á€¬","á€—á€»á€Šá€ºá€¸","á€¡á€á€¼á€±á€á€¶"]', 3, NULL, NOW(), NULL),
 
 (44, 1, 6, 2,
- '"အက္ခရာ ၃ လုံးပါသော စကားလုံးမှာ အမြဲတမ်း နာမ်တစ်ခုသာဖြစ်သည်။"',
- '<p><strong>မှန် / မမှန်</strong> - "အက္ခရာ ၃ လုံးပါသော စကားလုံးမှာ အမြဲတမ်း နာမ်တစ်ခုသာဖြစ်သည်။"</p>',
- NULL, 'ဥပမာ - "သွား" သည် ကြိယာဖြစ်ပြီး ၃ လုံးသာ ပါသည်။', 'မမှန်။ "သွား" (ကြိယာ)၊ "ပင်" (အပိုဒ်) စသည့် ၃ လုံးစကားလုံးအချို့က နာမ်မဟုတ်ပါ။',
- 2, 1.0, 0.25, 1, 0, NULL, '["ဝေါဟာရ","စကားလုံးအမျိုးအစား"]', 3, NULL, NOW(), NULL);
+ '"á€¡á€€á€¹á€á€›á€¬ áƒ á€œá€¯á€¶á€¸á€•á€«á€žá€±á€¬ á€…á€€á€¬á€¸á€œá€¯á€¶á€¸á€™á€¾á€¬ á€¡á€™á€¼á€²á€á€™á€ºá€¸ á€”á€¬á€™á€ºá€á€…á€ºá€á€¯á€žá€¬á€–á€¼á€…á€ºá€žá€Šá€ºá‹"',
+ '<p><strong>á€™á€¾á€”á€º / á€™á€™á€¾á€”á€º</strong> - "á€¡á€€á€¹á€á€›á€¬ áƒ á€œá€¯á€¶á€¸á€•á€«á€žá€±á€¬ á€…á€€á€¬á€¸á€œá€¯á€¶á€¸á€™á€¾á€¬ á€¡á€™á€¼á€²á€á€™á€ºá€¸ á€”á€¬á€™á€ºá€á€…á€ºá€á€¯á€žá€¬á€–á€¼á€…á€ºá€žá€Šá€ºá‹"</p>',
+ NULL, 'á€¥á€•á€™á€¬ - "á€žá€½á€¬á€¸" á€žá€Šá€º á€€á€¼á€­á€šá€¬á€–á€¼á€…á€ºá€•á€¼á€®á€¸ áƒ á€œá€¯á€¶á€¸á€žá€¬ á€•á€«á€žá€Šá€ºá‹', 'á€™á€™á€¾á€”á€ºá‹ "á€žá€½á€¬á€¸" (á€€á€¼á€­á€šá€¬)áŠ "á€•á€„á€º" (á€¡á€•á€­á€¯á€’á€º) á€…á€žá€Šá€·á€º áƒ á€œá€¯á€¶á€¸á€…á€€á€¬á€¸á€œá€¯á€¶á€¸á€¡á€á€»á€­á€¯á€·á€€ á€”á€¬á€™á€ºá€™á€Ÿá€¯á€á€ºá€•á€«á‹',
+ 2, 1.0, 0.25, 1, 0, NULL, '["á€á€±á€«á€Ÿá€¬á€›","á€…á€€á€¬á€¸á€œá€¯á€¶á€¸á€¡á€™á€»á€­á€¯á€¸á€¡á€…á€¬á€¸"]', 3, NULL, NOW(), NULL);
 
 -- ------------------------------------------------------------
--- TABLE: m_answer_option (Answer Options for MCQs)
+-- TABLE: m_answer_options (Answer Options for MCQs)
 -- Question 1 (Math): 2x+6=20  Answer= x=7 (opt B)
 -- ------------------------------------------------------------
-INSERT INTO m_answer_option
+INSERT INTO m_answer_options
 (id, question_id, option_text, option_html, option_image_url, is_correct, marks_allocated, sort_order, is_deleted, created_datetime, updated_datetime)
 VALUES
 -- Q1 (id=1): Math MCQ, Correct = B (7)
@@ -509,29 +507,29 @@ VALUES
 (7,  2, '243',        '<p>C. 243</p>',        NULL, 1, 1.0, 3, 0, NOW(), NULL),
 (8,  2, '729',        '<p>D. 729</p>',        NULL, 0, 0.0, 4, 0, NOW(), NULL),
 
--- Q3 (id=3): Circle area r=7, Correct = B (154 cm²)
-(9,  3, '44 cm²',     '<p>A. 44 cm²</p>',     NULL, 0, 0.0, 1, 0, NOW(), NULL),
-(10, 3, '154 cm²',    '<p>B. 154 cm²</p>',    NULL, 1, 2.0, 2, 0, NOW(), NULL),
-(11, 3, '308 cm²',    '<p>C. 308 cm²</p>',    NULL, 0, 0.0, 3, 0, NOW(), NULL),
-(12, 3, '49 cm²',     '<p>D. 49 cm²</p>',     NULL, 0, 0.0, 4, 0, NOW(), NULL),
+-- Q3 (id=3): Circle area r=7, Correct = B (154 cmÂ²)
+(9,  3, '44 cmÂ²',     '<p>A. 44 cmÂ²</p>',     NULL, 0, 0.0, 1, 0, NOW(), NULL),
+(10, 3, '154 cmÂ²',    '<p>B. 154 cmÂ²</p>',    NULL, 1, 2.0, 2, 0, NOW(), NULL),
+(11, 3, '308 cmÂ²',    '<p>C. 308 cmÂ²</p>',    NULL, 0, 0.0, 3, 0, NOW(), NULL),
+(12, 3, '49 cmÂ²',     '<p>D. 49 cmÂ²</p>',     NULL, 0, 0.0, 4, 0, NOW(), NULL),
 
--- Q4 (id=4): sin θ=3/5 → cos θ, Correct = A (4/5)
+-- Q4 (id=4): sin Î¸=3/5 â†’ cos Î¸, Correct = A (4/5)
 (13, 4, '4/5',        '<p>A. 4/5</p>',        NULL, 1, 2.0, 1, 0, NOW(), NULL),
 (14, 4, '3/4',        '<p>B. 3/4</p>',        NULL, 0, 0.0, 2, 0, NOW(), NULL),
 (15, 4, '5/4',        '<p>C. 5/4</p>',        NULL, 0, 0.0, 3, 0, NOW(), NULL),
 (16, 4, '5/3',        '<p>D. 5/3</p>',        NULL, 0, 0.0, 4, 0, NOW(), NULL),
 
--- Q5 (id=5): Factorize x²-9, Correct = A (x-3)(x+3)
+-- Q5 (id=5): Factorize xÂ²-9, Correct = A (x-3)(x+3)
 (17, 5, '(x-3)(x+3)', '<p>A. (x-3)(x+3)</p>', NULL, 1, 1.0, 1, 0, NOW(), NULL),
 (18, 5, '(x-9)(x+1)', '<p>B. (x-9)(x+1)</p>', NULL, 0, 0.0, 2, 0, NOW(), NULL),
-(19, 5, '(x-3)²',     '<p>C. (x-3)²</p>',     NULL, 0, 0.0, 3, 0, NOW(), NULL),
+(19, 5, '(x-3)Â²',     '<p>C. (x-3)Â²</p>',     NULL, 0, 0.0, 3, 0, NOW(), NULL),
 (20, 5, '(x+9)(x-1)', '<p>D. (x+9)(x-1)</p>', NULL, 0, 0.0, 4, 0, NOW(), NULL),
 
--- Q6 (id=6): True/False - Triangle 360°, Correct = B (False)
+-- Q6 (id=6): True/False - Triangle 360Â°, Correct = B (False)
 (21, 6, 'True',       '<p>A. True</p>',       NULL, 0, 0.0, 1, 0, NOW(), NULL),
 (22, 6, 'False',      '<p>B. False</p>',      NULL, 1, 1.0, 2, 0, NOW(), NULL),
 
--- Q7 (id=7): True/False - √2 irrational, Correct = A (True)
+-- Q7 (id=7): True/False - âˆš2 irrational, Correct = A (True)
 (23, 7, 'True',       '<p>A. True</p>',       NULL, 1, 1.0, 1, 0, NOW(), NULL),
 (24, 7, 'False',      '<p>B. False</p>',      NULL, 0, 0.0, 2, 0, NOW(), NULL),
 
@@ -633,11 +631,11 @@ VALUES
 (87, 30, 'Abraham Lincoln',   '<p>C. Abraham Lincoln</p>',   NULL, 0, 0.0, 3, 0, NOW(), NULL),
 (88, 30, 'John Adams',        '<p>D. John Adams</p>',        NULL, 0, 0.0, 4, 0, NOW(), NULL),
 
--- Q31 (id=31): dy/dx of x³-2x²+5, Correct = D (3x²-4x)
-(89, 31, '3x² + 4x',          '<p>A. 3x² + 4x</p>',          NULL, 0, 0.0, 1, 0, NOW(), NULL),
-(90, 31, 'x² - 4x',           '<p>B. x² - 4x</p>',           NULL, 0, 0.0, 2, 0, NOW(), NULL),
-(91, 31, '3x² - 2x',          '<p>C. 3x² - 2x</p>',          NULL, 0, 0.0, 3, 0, NOW(), NULL),
-(92, 31, '3x² - 4x',          '<p>D. 3x² - 4x</p>',          NULL, 1, 2.0, 4, 0, NOW(), NULL),
+-- Q31 (id=31): dy/dx of xÂ³-2xÂ²+5, Correct = D (3xÂ²-4x)
+(89, 31, '3xÂ² + 4x',          '<p>A. 3xÂ² + 4x</p>',          NULL, 0, 0.0, 1, 0, NOW(), NULL),
+(90, 31, 'xÂ² - 4x',           '<p>B. xÂ² - 4x</p>',           NULL, 0, 0.0, 2, 0, NOW(), NULL),
+(91, 31, '3xÂ² - 2x',          '<p>C. 3xÂ² - 2x</p>',          NULL, 0, 0.0, 3, 0, NOW(), NULL),
+(92, 31, '3xÂ² - 4x',          '<p>D. 3xÂ² - 4x</p>',          NULL, 1, 2.0, 4, 0, NOW(), NULL),
 
 -- Q33 (id=33): det [[3,4],[2,5]], Correct = B (7)
 (93, 33, '15',                '<p>A. 15</p>',                NULL, 0, 0.0, 1, 0, NOW(), NULL),
@@ -657,7 +655,7 @@ VALUES
 (103,35, 'Gas',               '<p>C. Gas</p>',               NULL, 0, 0.0, 3, 0, NOW(), NULL),
 (104,35, 'Viscous',           '<p>D. Viscous</p>',           NULL, 1, 1.0, 4, 0, NOW(), NULL),
 
--- Q36 (id=36): Water boils 100°F, Correct = B (False)
+-- Q36 (id=36): Water boils 100Â°F, Correct = B (False)
 (105,36, 'True',              '<p>A. True</p>',              NULL, 0, 0.0, 1, 0, NOW(), NULL),
 (106,36, 'False',             '<p>B. False</p>',             NULL, 1, 1.0, 2, 0, NOW(), NULL),
 
@@ -686,21 +684,21 @@ VALUES
 (122,41, '60',                '<p>D. 60 (sum)</p>',          NULL, 0, 0.0, 4, 0, NOW(), NULL),
 
 -- Q43 (id=43): Myanmar consonants count, Correct = C (33)
-(123,43, '၂၆ လုံး',           '<p>A. ၂၆ လုံး</p>',           NULL, 0, 0.0, 1, 0, NOW(), NULL),
-(124,43, '၃၀ လုံး',           '<p>B. ၃၀ လုံး</p>',           NULL, 0, 0.0, 2, 0, NOW(), NULL),
-(125,43, '၃၃ လုံး',           '<p>C. ၃၃ လုံး</p>',           NULL, 1, 1.0, 3, 0, NOW(), NULL),
-(126,43, '၃၆ လုံး',           '<p>D. ၃၆ လုံး</p>',           NULL, 0, 0.0, 4, 0, NOW(), NULL),
+(123,43, 'á‚á† á€œá€¯á€¶á€¸',           '<p>A. á‚á† á€œá€¯á€¶á€¸</p>',           NULL, 0, 0.0, 1, 0, NOW(), NULL),
+(124,43, 'áƒá€ á€œá€¯á€¶á€¸',           '<p>B. áƒá€ á€œá€¯á€¶á€¸</p>',           NULL, 0, 0.0, 2, 0, NOW(), NULL),
+(125,43, 'áƒáƒ á€œá€¯á€¶á€¸',           '<p>C. áƒáƒ á€œá€¯á€¶á€¸</p>',           NULL, 1, 1.0, 3, 0, NOW(), NULL),
+(126,43, 'áƒá† á€œá€¯á€¶á€¸',           '<p>D. áƒá† á€œá€¯á€¶á€¸</p>',           NULL, 0, 0.0, 4, 0, NOW(), NULL),
 
--- Q44 (id=44): Myanmar T/F sentence, Correct = B (မမှန်)
-(127,44, 'မှန်',              '<p>A. မှန်</p>',              NULL, 0, 0.0, 1, 0, NOW(), NULL),
-(128,44, 'မမှန်',            '<p>B. မမှန်</p>',            NULL, 1, 1.0, 2, 0, NOW(), NULL);
+-- Q44 (id=44): Myanmar T/F sentence, Correct = B (á€™á€™á€¾á€”á€º)
+(127,44, 'á€™á€¾á€”á€º',              '<p>A. á€™á€¾á€”á€º</p>',              NULL, 0, 0.0, 1, 0, NOW(), NULL),
+(128,44, 'á€™á€™á€¾á€”á€º',            '<p>B. á€™á€™á€¾á€”á€º</p>',            NULL, 1, 1.0, 2, 0, NOW(), NULL);
 
 -- ------------------------------------------------------------
--- TABLE: m_marking_rule (Marking rules per subject & type)
+-- TABLE: m_marking_rules (Marking rules per subject & type)
 -- ------------------------------------------------------------
-TRUNCATE TABLE m_marking_rule;
+TRUNCATE TABLE m_marking_rules;
 
-INSERT INTO m_marking_rule
+INSERT INTO m_marking_rules
 (id, subject_id, question_type, marks_per_question, negative_marks, min_questions, max_questions,
  difficulty, rule_name, description, is_active, is_deleted,
  created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -764,9 +762,9 @@ VALUES
  'G10-His-MCQ-Dates',     'Grade 10 History Dates & Leaders MCQ',       1, 0, 1, NULL, NOW(), NULL);
 
 -- ------------------------------------------------------------
--- TABLE: t_exam (Exam Papers)
+-- TABLE: t_exams (Exam Papers)
 -- ------------------------------------------------------------
-INSERT INTO t_exam
+INSERT INTO t_exams
 (id, exam_code, title, subject_id, grade_id, total_questions, duration_minutes,
  total_marks, pass_marks, exam_date, description, exam_config_json,
  is_active, is_deleted, created_user_id, updated_user_id, created_datetime, updated_datetime)
@@ -812,9 +810,9 @@ VALUES
  1, 0, 4, NULL, NOW(), NULL);
 
 -- ------------------------------------------------------------
--- TABLE: t_exam_question (Questions attached to each exam)
+-- TABLE: t_exam_questions (Questions attached to each exam)
 -- ------------------------------------------------------------
-INSERT INTO t_exam_question
+INSERT INTO t_exam_questions
 (id, exam_id, question_id, question_number, marks_allocated, section_name, is_deleted, created_datetime)
 VALUES
 -- Exam 1: G10 Math (20 questions)
@@ -881,7 +879,7 @@ VALUES
 (52, 4, 9,  15,5.0, 'Math Expression - Quadratic', 0, NOW());
 
 -- ------------------------------------------------------------
--- TABLE: m_token (Leave empty for seed; populated at runtime)
+-- TABLE: m_tokens (Leave empty for seed; populated at runtime)
 -- ------------------------------------------------------------
 
 SET FOREIGN_KEY_CHECKS = 1;

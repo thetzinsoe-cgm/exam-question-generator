@@ -40,3 +40,47 @@
 .navbar a:hover, .dropdown-menu .dropdown-item:hover,
 .small-box > .small-box-footer:hover,
 a.btn:hover, a.btn:focus { text-decoration: none; }
+
+/* Table improvements */
+.table { border-color: #dee2e6; }
+.table thead th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: #6c757d; border-bottom-width: 2px; }
+.table td { vertical-align: middle; font-size: 0.9rem; }
+.table-striped > tbody > tr:nth-of-type(odd) { background-color: rgba(0,0,0,.015); }
+.table-hover > tbody > tr:hover { background-color: rgba(0,123,255,.04); }
+.table td code { font-size: 0.82rem; }
+
+/* Button consistency */
+.btn { transition: all 0.15s ease-in-out; }
+.btn-sm { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+.btn-outline-danger:hover { box-shadow: 0 0 0 0.15rem rgba(220,53,69,.25); }
+.btn-outline-primary:hover { box-shadow: 0 0 0 0.15rem rgba(0,123,255,.25); }
+.btn-outline-success:hover { box-shadow: 0 0 0 0.15rem rgba(40,167,69,.25); }
+.btn-outline-info:hover { box-shadow: 0 0 0 0.15rem rgba(23,162,184,.25); }
+
+/* Form controls */
+.form-control:focus { border-color: #80bdff; box-shadow: 0 0 0 0.15rem rgba(0,123,255,.15); }
+.form-control-sm { font-size: 0.85rem; }
+
+/* Badge polish */
+.badge { font-weight: 500; font-size: 0.75rem; }
+.badge-pill { letter-spacing: 0.02em; }
+
+/* Card improvements */
+.card { box-shadow: 0 0.05rem 0.15rem rgba(0,0,0,.05); border: 1px solid #dee2e6; }
+.card-header { font-weight: 600; }
+
+/* Alert improvements */
+.alert-info { border-left: 3px solid #17a2b8; }
+
+/* Pagination */
+.pagination .page-link { font-size: 0.85rem; padding: 0.35rem 0.65rem; }
+
+/* Responsive table scroll hint */
+.table-responsive { border-radius: 0.25rem; }
+
+/* Content section spacing */
+.content .container-fluid { padding-top: 0.5rem; }
+.content .card { margin-top: 0.5rem; }
+
+/* Text alignment helpers for data */
+.text-right.font-weight-bold { font-family: Consolas, Monaco, monospace; font-size: 0.9rem; }

@@ -7,17 +7,17 @@
 }
 <div class="card card-primary">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-magic"></i> Configure &amp; Generate Exam</h3>
+        <h3 class="card-title"><i class="fas fa-magic mr-2"></i>Configure &amp; Generate Exam</h3>
     </div>
     <div class="card-body">
         <form asp-action="Generate" method="post" id="examForm">
             <div class="row">
                 <div class="form-group col-md-4">
-                    <label>Title *</label>
-                    <input type="text" name="title" class="form-control" maxlength="255" required placeholder="Mid Term - Mathematics 10" />
+                    <label for="title">Title <span class="text-danger">*</span></label>
+                    <input type="text" id="title" name="title" class="form-control" maxlength="255" required placeholder="Mid Term - Mathematics 10" />
                 </div>
                 <div class="form-group col-md-2">
-                    <label>Grade *</label>
+                    <label for="grade_id">Grade <span class="text-danger">*</span></label>
                     <select id="grade_id" name="grade_id" class="form-control" required>
                         <option value="">-- Grade --</option>
                         @foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
@@ -27,32 +27,32 @@
                     </select>
                 </div>
                 <div class="form-group col-md-2">
-                    <label>Subject *</label>
+                    <label for="subject_id">Subject <span class="text-danger">*</span></label>
                     <select id="subject_id" name="subject_id" class="form-control" required>
                         <option value="">-- Subject --</option>
                     </select>
                 </div>
                 <div class="form-group col-md-2">
-                    <label>Exam Date</label>
-                    <input type="date" name="exam_date" class="form-control" />
+                    <label for="exam_date">Exam Date</label>
+                    <input type="date" id="exam_date" name="exam_date" class="form-control" />
                 </div>
                 <div class="form-group col-md-2">
-                    <label>Duration (min)</label>
-                    <input type="number" min="1" name="duration_minutes" class="form-control" value="120" />
+                    <label for="duration_minutes">Duration (min)</label>
+                    <input type="number" id="duration_minutes" min="1" name="duration_minutes" class="form-control" value="120" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-3">
-                    <label>Total Questions (optional)</label>
-                    <input type="number" min="0" name="total_questions" class="form-control" placeholder="auto from rules" />
+                    <label for="total_questions">Total Questions (optional)</label>
+                    <input type="number" id="total_questions" min="0" name="total_questions" class="form-control" placeholder="auto from rules" />
                 </div>
                 <div class="form-group col-md-3">
-                    <label>Total Marks (optional)</label>
-                    <input type="number" step="0.01" min="0" name="total_marks" class="form-control" placeholder="auto from rules" />
+                    <label for="total_marks">Total Marks (optional)</label>
+                    <input type="number" id="total_marks" step="0.01" min="0" name="total_marks" class="form-control" placeholder="auto from rules" />
                 </div>
                 <div class="form-group col-md-3">
-                    <label>Pass Marks (optional)</label>
-                    <input type="number" step="0.01" min="0" name="pass_marks" class="form-control" />
+                    <label for="pass_marks">Pass Marks (optional)</label>
+                    <input type="number" id="pass_marks" step="0.01" min="0" name="pass_marks" class="form-control" />
                 </div>
                 <div class="form-group col-md-3 mt-4">
                     <div class="custom-control custom-checkbox">
@@ -61,29 +61,32 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Description / Instructions</label>
-                <textarea name="description" class="form-control" rows="3" maxlength="1000">Write your name and ID clearly. Read each question carefully before answering. Use the back of the sheet if you need extra space.</textarea>
-            </div>
+                <div class="form-group">
+                    <label for="description">Description / Instructions</label>
+                    <textarea id="description" name="description" class="form-control" rows="3" maxlength="1000">Write your name and ID clearly. Read each question carefully before answering. Use the back of the sheet if you need extra space.</textarea>
+                </div>
 
-            <div class="card card-secondary">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Section Configuration <small class="text-muted">(leave empty to auto-build from subject Marking Rules)</small></h5>
+            <div class="card card-secondary" style="border-left: 4px solid #17a2b8;">
+                <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                    <h5 class="mb-0"><i class="fas fa-list-ol mr-1 text-info"></i>Section Configuration <small class="text-muted">(leave empty to auto-build from subject Marking Rules)</small></h5>
                     <div>
-                        <button type="button" class="btn btn-sm btn-info" id="loadFromRulesBtn"><i class="fas fa-layer-group"></i> Load from Marking Rules</button>
-                        <button type="button" class="btn btn-sm btn-success" id="addSectionBtn"><i class="fas fa-plus"></i> Add Section</button>
+                        <button type="button" class="btn btn-sm btn-info" id="loadFromRulesBtn"><i class="fas fa-layer-group mr-1"></i>Load from Marking Rules</button>
+                        <button type="button" class="btn btn-sm btn-success" id="addSectionBtn"><i class="fas fa-plus mr-1"></i>Add Section</button>
                     </div>
                 </div>
                 <div class="card-body" id="sectionsContainer">
-                    <div class="alert alert-info">If no sections are defined, the generator will automatically build sections using the subject's configured marking rules.</div>
+                    <div class="alert alert-info mb-0"><i class="fas fa-info-circle mr-1"></i>If no sections are defined, the generator will automatically build sections using the subject's configured marking rules.</div>
                 </div>
             </div>
 
-            <div class="text-right mt-4">
-                <a href="/admin/exam/index" class="btn btn-default">Cancel</a>
-                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-magic"></i> Generate Exam</button>
-                <div asp-validation-summary="All" class="text-danger mt-3 text-left"></div>
+            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                <a href="/admin/exam/index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left mr-1"></i>Back to Exams</a>
+                <div>
+                    <button type="submit" class="btn btn-primary btn-lg" id="generateBtn"><i class="fas fa-magic mr-1"></i>Generate Exam</button>
+                </div>
             </div>
+            <div asp-validation-summary="All" class="text-danger mt-3 text-left"></div>
+            <div id="examFormMsg" class="mt-2" role="alert" aria-live="assertive"></div>
         </form>
     </div>
 </div>
@@ -94,15 +97,16 @@
     function sectionTemplate(idx, data) {
         data = data || {};
         return `
-        <div class="border p-3 mb-3 rounded section-row" data-idx="${idx}">
+        <div class="border p-3 mb-3 rounded section-row" data-idx="${idx}" style="border-left: 3px solid #007bff !important; background: #f8f9fa;">
+            <input type="hidden" name="sections.Index" value="${idx}" />
             <div class="row">
                 <div class="col-md-3">
-                    <label>Section Name</label>
-                    <input type="text" name="sections[${idx}].section_name" value="${data.section_name ?? ('Section ' + (idx+1))}" class="form-control" />
+                    <label for="sec-${idx}-name">Section Name</label>
+                    <input type="text" id="sec-${idx}-name" name="sections[${idx}].section_name" value="${data.section_name ?? ('Section ' + (idx+1))}" class="form-control" />
                 </div>
                 <div class="col-md-3">
-                    <label>Question Type</label>
-                    <select name="sections[${idx}].question_type" class="form-control sec-qtype">
+                    <label for="sec-${idx}-type">Question Type</label>
+                    <select id="sec-${idx}-type" name="sections[${idx}].question_type" class="form-control sec-qtype">
                         <option value="1">Multiple Choice</option>
                         <option value="2">True/False</option>
                         <option value="3">Short Answer</option>
@@ -115,8 +119,8 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label>Difficulty</label>
-                    <select name="sections[${idx}].difficulty" class="form-control">
+                    <label for="sec-${idx}-diff">Difficulty</label>
+                    <select id="sec-${idx}-diff" name="sections[${idx}].difficulty" class="form-control">
                         <option value="">Any</option>
                         <option value="1">Easy</option>
                         <option value="2">Medium</option>
@@ -124,22 +128,45 @@
                     </select>
                 </div>
                 <div class="col-md-1">
-                    <label>Count</label>
-                    <input type="number" name="sections[${idx}].question_count" class="form-control" min="1" value="${data.question_count ?? 10}" />
+                    <label for="sec-${idx}-count">Count</label>
+                    <input type="number" id="sec-${idx}-count" name="sections[${idx}].question_count" class="form-control sec-count" min="1" value="${data.question_count ?? 10}" />
+                    <div class="text-danger small sec-error"></div>
                 </div>
                 <div class="col-md-1">
-                    <label>Marks/Q</label>
-                    <input type="number" step="0.01" name="sections[${idx}].marks_per_question" class="form-control" min="0" value="${data.marks_per_question ?? 1}" />
+                    <label for="sec-${idx}-marks">Marks/Q</label>
+                    <input type="number" step="0.01" id="sec-${idx}-marks" name="sections[${idx}].marks_per_question" class="form-control sec-marks" min="0" value="${data.marks_per_question ?? 1}" />
+                    <div class="text-danger small sec-error"></div>
                 </div>
                 <div class="col-md-1">
-                    <label>-ve</label>
-                    <input type="number" step="0.01" name="sections[${idx}].negative_marks" class="form-control" min="0" value="${data.negative_marks ?? 0}" />
+                    <label for="sec-${idx}-neg">-ve</label>
+                    <input type="number" step="0.01" id="sec-${idx}-neg" name="sections[${idx}].negative_marks" class="form-control" min="0" value="${data.negative_marks ?? 0}" />
                 </div>
                 <div class="col-md-1 align-self-end text-right">
-                    <button type="button" class="btn btn-sm btn-danger removeSec"><i class="fas fa-times"></i></button>
+                    <button type="button" class="btn btn-sm btn-danger removeSec" aria-label="Remove section"><i class="fas fa-times" aria-hidden="true"></i></button>
                 </div>
             </div>
         </div>`;
+    }
+
+    function showMsg(text, isError) {
+        var box = $('#examFormMsg');
+        box.text(text || '');
+        box.toggleClass('text-danger', !!isError).toggleClass('text-success', !isError);
+    }
+
+    function validateSection(row) {
+        var ok = true;
+        var count = row.find('.sec-count');
+        var countErr = count.next('.sec-error');
+        var marks = row.find('.sec-marks');
+        var marksErr = marks.next('.sec-error');
+        if (!count.val() || parseInt(count.val(), 10) < 1) {
+            countErr.text('Count must be ≥ 1'); count.addClass('is-invalid'); ok = false;
+        } else { countErr.text(''); count.removeClass('is-invalid'); }
+        if (marks.val() === '' || parseFloat(marks.val()) < 0) {
+            marksErr.text('Marks must be ≥ 0'); marks.addClass('is-invalid'); ok = false;
+        } else { marksErr.text(''); marks.removeClass('is-invalid'); }
+        return ok;
     }
     function addSection(data) {
         $('#sectionsContainer').find('.alert').remove();
@@ -156,21 +183,38 @@
                 var list = data.data || data || [];
                 var sel = $('#subject_id').empty().append('<option value="">-- Subject --');
                 list.forEach(function (s) { sel.append($('<option>', { value: s.id, text: s.name })); });
-            });
+            }).fail(function () { showMsg('Failed to load subjects. Please try again.', true); });
         });
 
         $('#addSectionBtn').on('click', function () { addSection(); });
         $(document).on('click', '.removeSec', function () { $(this).closest('.section-row').remove(); });
 
+        $(document).on('blur', '.sec-count, .sec-marks', function () {
+            validateSection($(this).closest('.section-row'));
+        });
+
+        $('#examForm').on('submit', function (e) {
+            var allOk = true;
+            $('.section-row').each(function () { if (!validateSection($(this))) { allOk = false; } });
+            if (!allOk) {
+                e.preventDefault();
+                showMsg('Please fix the highlighted section errors before generating.', true);
+                return false;
+            }
+            var btn = $('#generateBtn');
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Generating...');
+            showMsg('Generating exam...', false);
+        });
+
         $('#loadFromRulesBtn').on('click', function () {
             var subj = $('#subject_id').val();
-            if (!subj) { alert('Please select a subject first.'); return; }
+            if (!subj) { showMsg('Please select a subject first.', true); return; }
             $.getJSON('/admin/marking-rules-by-subject?subjectId=' + subj, function (data) {
                 var rules = data.data || data || [];
-                if (!rules.length) { alert('No marking rules configured for this subject.'); return; }
+                if (!rules.length) { showMsg('No marking rules configured for this subject.', true); return; }
                 $('#sectionsContainer').empty(); sIdx = 0;
                 rules.forEach(function (r) { addSection({ question_type: r.question_type, section_name: (r.rule_name || ('Type ' + r.question_type)), question_count: (r.max_questions || r.min_questions || 10), marks_per_question: r.marks_per_question, negative_marks: r.negative_marks }); });
-            });
+            }).fail(function () { showMsg('Failed to load marking rules. Please try again.', true); });
         });
     });
 </script>

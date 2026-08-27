@@ -10,11 +10,12 @@ _(nothing — clean state)_
 
 ## NEXT (ordered)
 
-1. Move secrets out of `appsettings.json` → user secrets (`dotnet user-secrets set ...`) or env vars: DB passwords, `JwtSettings:Key`
-2. Replace sync `Html.Partial(...)` with `<partial>` tag helper in 6 views: `Views/{Subject,AdminUser,Exam,Grade,MarkingRule,Question}/Index.cshtml`
-3. Clean Program.cs duplicates: `DatabaseHelper.Initialize` called twice; collapse `AddControllers()`/`AddControllersWithViews()` into one chain
-4. Restrict ForwardedHeaders (`KnownNetworks`/`KnownProxies`) to the actual reverse proxy
-5. Upgrade/patch log4net (NU1902) or evaluate suppression rationale
+1. **Make the initial git commit** — repo has zero commits; everything staged as `A` (including `Database/*.sql` which the old .gitignore was hiding, and PROJECT/STATE/KNOWLEDGE docs). Review `git status`, then commit
+2. Move secrets out of `appsettings.json` → user secrets (`dotnet user-secrets set ...`) or env vars: DB passwords, `JwtSettings:Key` — do this BEFORE pushing anywhere public
+3. Replace sync `Html.Partial(...)` with `<partial>` tag helper in 6 views: `Views/{Subject,AdminUser,Exam,Grade,MarkingRule,Question}/Index.cshtml`
+4. Clean Program.cs duplicates: `DatabaseHelper.Initialize` called twice; collapse `AddControllers()`/`AddControllersWithViews()` into one chain
+5. Restrict ForwardedHeaders (`KnownNetworks`/`KnownProxies`) to the actual reverse proxy
+6. Upgrade/patch log4net (NU1902) or evaluate suppression rationale
 
 ## BACKLOG (unordered ideas)
 

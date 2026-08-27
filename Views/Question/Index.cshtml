@@ -7,13 +7,17 @@
 }
 @section Toolbar {
     <a href="/admin/question/create" class="btn btn-primary"><i class="fas fa-plus mr-1"></i>Add Question</a>
-    <a href="/admin/question/bulk-import" class="btn btn-warning"><i class="fas fa-file-upload mr-1"></i>Bulk Import</a>
+    <a href="/admin/question/bulk-import" class="btn btn-outline-warning"><i class="fas fa-file-upload mr-1"></i>Bulk Import</a>
 }
 <div class="card">
     <div class="card-body">
-        <form asp-action="Index" method="get" class="row mb-3">
-            <div class="col-md-3"><input type="text" name="search" value="@Model.Filter.search" class="form-control" placeholder="Search question text..." /></div>
-            <div class="col-md-2">
+        <form asp-action="Index" method="get" class="row mb-3 align-items-end">
+            <div class="col-md-3 mb-2">
+                <label for="questionSearch" class="sr-only">Search questions</label>
+                <input type="text" id="questionSearch" name="search" value="@Model.Filter.search" class="form-control" placeholder="Search question text..." />
+            </div>
+            <div class="col-md-2 mb-2">
+                <label for="gradeFilter" class="sr-only">Filter by grade</label>
                 @{
                     var grades = ViewBag.Grades as System.Collections.IEnumerable ?? new object[0];
                 }
@@ -25,7 +29,8 @@
                     }
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 mb-2">
+                <label for="subjectFilter" class="sr-only">Filter by subject</label>
                 <select name="subject_id" id="subjectFilter" class="form-control">
                     <option value="" selected="@(Model.Filter.subject_id == null)">All Subjects</option>
                     @{
@@ -40,8 +45,9 @@
                     }
                 </select>
             </div>
-            <div class="col-md-2">
-                <select name="question_type" class="form-control">
+            <div class="col-md-2 mb-2">
+                <label for="questionTypeFilter" class="sr-only">Filter by type</label>
+                <select name="question_type" id="questionTypeFilter" class="form-control">
                     <option value="" selected="@(Model.Filter.question_type == null)">All Types</option>
                     <option value="1" selected="@(Model.Filter.question_type == 1)">Multiple Choice</option>
                     <option value="2" selected="@(Model.Filter.question_type == 2)">True/False</option>
@@ -53,20 +59,23 @@
                     <option value="8" selected="@(Model.Filter.question_type == 8)">Fill in the Blanks</option>
                 </select>
             </div>
-            <div class="col-md-1">@Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", onchange = "$(this).closest('form').submit()" })</div>
-            <div class="col-md-2 text-right">
-                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
-                <a href="/admin/question/index" class="btn btn-default"><i class="fas fa-redo"></i></a>
+            <div class="col-md-1 mb-2">
+                <label for="pageSize" class="sr-only">Page size</label>
+                @Html.DropDownList("page_size", Model.PageSizeOptions, new { @class = "form-control", id = "pageSize", onchange = "$(this).closest('form').submit()" })
+            </div>
+            <div class="col-md-2 mb-2 text-right">
+                <button class="btn btn-primary" type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+                <a href="/admin/question/index" class="btn btn-outline-secondary" aria-label="Reset filters"><i class="fas fa-redo"></i></a>
             </div>
         </form>
 
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead>
+            <table class="table table-bordered table-striped table-hover align-middle mb-0">
+                <thead class="thead-light">
                     <tr>
                         <th>Id</th><th>Type</th><th>Grade / Subject</th><th>Question (Preview)</th>
-                        <th>Default Marks</th><th>Difficulty</th><th>Status</th>
-                        <th class="text-center" style="width:160px">Action</th>
+                        <th class="text-right">Default Marks</th><th>Difficulty</th><th>Status</th>
+                        <th class="text-center" style="width:120px">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,17 +91,26 @@
                                     @if (!string.IsNullOrWhiteSpace(q.image_url)) { <img src="@q.image_url" class="img-fluid mb-1" style="max-height:40px;border:1px solid #ddd" /> }
                                     <div>@((q.question_text ?? "").Length > 120 ? q.question_text.Substring(0, 120) + "..." : q.question_text)</div>
                                 </td>
-                                <td>@q.default_marks</td>
+                                <td class="text-right font-weight-bold">@q.default_marks.ToString("0.##")</td>
                                 <td><span class="badge badge-pill badge-@(q.difficulty == 1 ? "success" : q.difficulty == 2 ? "warning" : "danger")">@(q.difficulty == 1 ? "Easy" : q.difficulty == 2 ? "Medium" : "Hard")</span></td>
                                 <td>@if (q.is_active) { <span class="badge badge-success">Active</span> } else { <span class="badge badge-danger">Inactive</span> }</td>
                                 <td class="text-center">
-                                    <a href="/admin/question/edit/@q.id?listingPageUrl=@Context.Request.Path@Context.Request.QueryString" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                    <a href="/admin/question/delete/@q.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-danger" onclick="return confirm('Delete this question?')"><i class="fas fa-trash"></i></a>
+                                    <a href="/admin/question/edit/@q.id?listingPageUrl=@Context.Request.Path@Context.Request.QueryString" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a href="/admin/question/delete/@q.id?page_number=@(Model.Filter.page_number)" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this question?')"><i class="fas fa-trash"></i></a>
                                 </td>
                             </tr>
                         }
                     }
-                    else { <tr><td colspan="8" class="text-center text-muted">No questions found.</td></tr> }
+                    else {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="fas fa-question-circle fa-3x mb-3 d-block text-muted"></i>
+                                <p class="mb-2 font-weight-bold">No questions found</p>
+                                <p class="mb-3 small">Add questions to your bank or import them in bulk.</p>
+                                <a href="/admin/question/create" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i>Add Question</a>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>

@@ -42,11 +42,11 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label>Marks per Question *</label>
-                        <input type="number" step="0.01" min="0" name="marks_per_question" value="@Model.marks_per_question" class="form-control" required />
+                        <input type="number" step="0.01" min="0" name="marks_per_question" value="@Model.marks_per_question.ToString("0.##")" class="form-control" required />
                     </div>
                     <div class="form-group col-md-4">
                         <label>Negative Marks</label>
-                        <input type="number" step="0.01" min="0" name="negative_marks" value="@Model.negative_marks" class="form-control" />
+                        <input type="number" step="0.01" min="0" name="negative_marks" value="@Model.negative_marks.ToString("0.##")" class="form-control" />
                     </div>
                     <div class="form-group col-md-4"></div>
                     <div class="form-group col-md-4">
@@ -68,8 +68,8 @@
                         <textarea name="description" class="form-control" rows="2" maxlength="500">@Model.description</textarea>
                     </div>
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
-                        <a href="@listingPageUrl" class="btn btn-default">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4" id="saveBtn"><i class="fas fa-save mr-1"></i>Update</button>
+                        <a href="@listingPageUrl" class="btn btn-outline-secondary px-4 ml-1">Cancel</a>
                         <div asp-validation-summary="All" class="text-danger mt-3"></div>
                     </div>
                 </form>
@@ -77,3 +77,14 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    $(function () {
+        $('form').on('submit', function () {
+            var btn = $('#saveBtn');
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Saving...');
+        });
+    });
+</script>
+}

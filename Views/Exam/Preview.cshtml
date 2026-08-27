@@ -8,7 +8,7 @@
 @section Toolbar {
     <div>
         <a href="/admin/exam/export-pdf/@Model.id" target="_blank" class="btn btn-success"><i class="fas fa-file-pdf mr-1"></i>Download PDF</a>
-        <a href="/admin/exam/index" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="/admin/exam/index" class="btn btn-outline-secondary ml-1"><i class="fas fa-arrow-left mr-1"></i>Back</a>
     </div>
 }
 
@@ -30,7 +30,7 @@
                 <dl class="row">
                     <dt class="col-5">Duration:</dt><dd class="col-7">@Model.duration_minutes minutes</dd>
                     <dt class="col-5">Total Questions:</dt><dd class="col-7">@Model.total_questions</dd>
-                    <dt class="col-5">Total Marks / Pass:</dt><dd class="col-7">@Model.total_marks / @Model.pass_marks</dd>
+                    <dt class="col-5">Total Marks / Pass:</dt><dd class="col-7"><span class="font-weight-bold text-primary">@Model.total_marks.ToString("0.##")</span> / <span class="font-weight-bold text-primary">@Model.pass_marks.ToString("0.##")</span></dd>
                 </dl>
             </div>
         </div>
@@ -49,24 +49,23 @@
         qCount++;
         if (q.section_name != lastSection)
         {
-            if (lastSection != null) { <text></text>; }
             lastSection = q.section_name;
-            <div class="card mt-3">
-                <div class="card-header bg-light"><h5 class="mb-0">@lastSection</h5></div>
-            </div>
+        <div class="card border-left-primary rounded-left mb-3">
+            <div class="card-header bg-light py-2"><h5 class="mb-0"><i class="fas fa-layer-group mr-1 text-primary"></i>@lastSection</h5></div>
+        </div>
         }
-        <div class="card border-top-0 rounded-0 mb-1">
-            <div class="card-body py-2">
+        <div class="card mb-3 border-left-secondary" style="border-left-width: 3px !important;">
+            <div class="card-body py-3">
                 <div class="row">
-                    <div class="col-md-1 text-right font-weight-bold">Q@(q.question_number).</div>
+                    <div class="col-md-1 text-right font-weight-bold text-primary">Q@(q.question_number).</div>
                     <div class="col-md-11">
-                        <div class="d-flex justify-content-between mb-1">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="badge badge-pill badge-secondary mr-2">@q.question_type_name</span>
-                            <span class="text-muted">@q.marks_allocated marks</span>
+                            <span class="badge badge-pill badge-primary">@q.marks_allocated.ToString("0.##") marks</span>
                         </div>
                         @if (!string.IsNullOrWhiteSpace(q.image_url))
                         {
-                            <p><img src="@q.image_url" alt="" class="img-fluid mb-1 border" style="max-height:160px" /></p>
+                            <p><img src="@q.image_url" alt="@($"Diagram for question {q.question_number}")" class="img-fluid mb-1 border" style="max-height:160px" /></p>
                         }
                         <div class="mb-2">@Html.Raw(q.question_text)</div>
                         @if (!string.IsNullOrWhiteSpace(q.eco_table_json))
@@ -89,7 +88,7 @@
                                     </table>
                                 }
                             }
-                            catch { }
+                             catch { <tr><td colspan="6" class="text-danger small">Unable to render table data.</td></tr> }
                         }
                         @if (q.answer_options != null && q.answer_options.Any())
                         {
@@ -98,10 +97,10 @@
                                 @foreach (var opt in q.answer_options.OrderBy(a => a.sort_order))
                                 {
                                     oidx++;
-                                    <li>@opt.option_text
-                                        @if (!string.IsNullOrWhiteSpace(opt.option_image_url))
-                                        { <img src="@opt.option_image_url" class="img-fluid ml-2" style="max-height:40px;border:1px solid #ddd" /> }
-                                    </li>
+                                     <li>@opt.option_text
+                                         @if (!string.IsNullOrWhiteSpace(opt.option_image_url))
+                                         { <img src="@opt.option_image_url" alt="" class="img-fluid ml-2" style="max-height:40px;border:1px solid #ddd" /> }
+                                     </li>
                                 }
                             </ol>
                         }

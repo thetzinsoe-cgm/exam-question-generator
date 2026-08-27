@@ -22,6 +22,7 @@ namespace ExamSystem.Services.Exam
         Task<Response> GetExamWithQuestionsAsync(long id);
         Task<Response> GenerateExamAsync(ExamGenerateRequestDto dto);
         Task<Response> DeleteExamAsync(long id);
+        Task<Response> UpdateExamAsync(long id, ExamResponseDto dto);
         Task<byte[]> ExportToPdfAsync(long examId, string printTemplateHtml);
     }
 
@@ -193,6 +194,26 @@ namespace ExamSystem.Services.Exam
             if (e == null) throw new NotFoundException("Exam not found.");
             await _examDao.Delete(e);
             return Response.Success("Exam deleted successfully.");
+        }
+
+        public async Task<Response> UpdateExamAsync(long id, ExamResponseDto dto)
+        {
+            var e = await _examDao.GetById(id);
+            if (e == null) return Response.Error(new Error { Status = 404, Title = "Not Found", Detail = "Exam not found." });
+
+            e.title = dto.title;
+            e.description = dto.description;
+            e.grade_id = dto.grade_id;
+            e.subject_id = dto.subject_id;
+            e.duration_minutes = dto.duration_minutes;
+            e.pass_marks = dto.pass_marks;
+            e.exam_date = dto.exam_date;
+            e.is_active = dto.is_active;
+            e.updated_datetime = DateTime.Now;
+            e.updated_user_id = AuthUser.Id;
+
+            await _examDao.Update(e);
+            return Response.Success("Exam updated successfully.");
         }
 
         public async Task<byte[]> ExportToPdfAsync(long examId, string printTemplateHtml)

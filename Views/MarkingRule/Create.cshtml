@@ -82,7 +82,7 @@
                         <textarea name="description" class="form-control" rows="2" maxlength="500" placeholder="Optional — e.g. covers algebra and trigonometry MCQs..."></textarea>
                     </div>
                     <div class="col-12 pt-3 border-top">
-                        <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save mr-1"></i>Save Marking Rule</button>
+                        <button type="submit" class="btn btn-primary px-4" id="saveBtn"><i class="fas fa-save mr-1"></i>Save Marking Rule</button>
                         <a href="/admin/marking-rule/index" class="btn btn-outline-secondary px-4 ml-1">Cancel</a>
                         <div asp-validation-summary="All" class="text-danger mt-3"></div>
                     </div>
@@ -91,3 +91,14 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    $(function () {
+        $('form').on('submit', function () {
+            var btn = $('#saveBtn');
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Saving...');
+        });
+    });
+</script>
+}
