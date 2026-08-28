@@ -112,11 +112,13 @@
     .section-card .section-head { padding:.6rem 1rem; background:#e9ecef; border-bottom:1px solid #dee2e6; border-radius:.5rem .5rem 0 0; display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
     .section-card .section-body { padding:.75rem; min-height:60px; }
     .qs-sortable { min-height:40px; }
-    .q-row { display:flex; align-items:center; gap:.5rem; background:#fff; border:1px solid #dee2e6; border-radius:.375rem; padding:.4rem .6rem; margin-bottom:.4rem; }
-    .q-row .drag-handle { cursor:grab; color:#adb5bd; }
-    .q-row .q-info { flex:1; min-width:0; }
+    .q-row { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; background:#fff; border:1px solid #dee2e6; border-radius:.375rem; padding:.4rem .6rem; margin-bottom:.4rem; }
+    .q-row .drag-handle { cursor:grab; color:#adb5bd; flex-shrink:0; }
+    .q-row .q-info { flex:1 1 200px; min-width:0; }
     .q-row .q-info .t { font-size:.82rem; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .q-row .q-info .m { font-size:.7rem; color:#6c757d; }
+    .q-row .q-marks-wrap { flex-shrink:0; }
+    .q-row .removeQ { flex-shrink:0; }
     .q-row .marks-input { width:70px; }
     .q-row .q-num { font-weight:700; color:#007bff; width:28px; text-align:center; }
     .qs-sortable li.placeholder, .qs-sortable .sortable-ghost { opacity:.4; background:#dee2e6; }
@@ -181,7 +183,7 @@
                 <span class="badge badge-secondary type-badge mr-1">${esc(qTypeName(q.type))}</span>
                 <span class="badge badge-${q.diff==3?'danger':q.diff==1?'success':'warning'} type-badge mr-1">${esc(diffName(q.diff))}</span>
             </div>
-            <div class="input-group input-group-sm" style="width:110px">
+            <div class="q-marks-wrap input-group input-group-sm" style="width:110px; max-width:100%; flex-wrap:nowrap;">
                 <div class="input-group-prepend"><span class="input-group-text">+</span></div>
                 <input type="number" step="0.01" min="0" class="form-control marks-input" value="${q.marks > 0 ? q.marks : 1}" />
             </div>
