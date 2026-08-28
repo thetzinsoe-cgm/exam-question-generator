@@ -22,6 +22,7 @@ namespace ExamSystem.Services.Exam
         Task<Response> GetExamWithQuestionsAsync(long id);
         Task<Response> GenerateExamAsync(ExamGenerateRequestDto dto);
         Task<Response> GenerateExamManualAsync(ManualExamGenerateRequestDto dto);
+        Task<Response> UpdateExamManualAsync(long id, ManualExamGenerateRequestDto dto);
         Task<Response> DeleteExamAsync(long id);
         Task<Response> UpdateExamAsync(long id, ExamResponseDto dto);
         Task<byte[]> ExportToPdfAsync(long examId, string printTemplateHtml);
@@ -309,6 +310,90 @@ namespace ExamSystem.Services.Exam
 
             await _examDao.Update(e);
             return Response.Success("Exam updated successfully.");
+        }
+
+        public async Task<Response> UpdateExamManualAsync(long id, ManualExamGenerateRequestDto dto)
+        {
+            var e = await _examDao.GetById(id);
+            if (e == null) return Response.Error(new Error { Status = 404, Title = "Not Found", Detail = "Exam not found." });
+
+            if (dto.sections == null || !dto.sections.Any())
+            {
+                return Response.Error(new Error { Detail = "At least one section is required." });
+            }
+
+            var allQuestionIds = dto.sections
+                .SelectMany(s => s.questions)
+                .Select(q => q.question_id)
+                .ToList();
+
+            if (!allQuestionIds.Any())
+            {
+                return Response.Error(new Error { Detail = "At least one question must be selected." });
+            }
+
+            if (allQuestionIds.Distinct().Count() != allQuestionIds.Count)
+            {
+                return Response.Error(new Error { Detail = "Duplicate questions are not allowed." });
+            }
+
+            var questions = await _questionDao.GetByIdsAsync(allQuestionIds);
+            if (questions.Count != allQuestionIds.Count)
+            {
+                return Response.Error(new Error { Detail = "One or more selected questions not found." });
+            }
+
+            var invalidQuestions = questions.Where(q => q.subject_id != dto.subject_id || q.grade_id != dto.grade_id).ToList();
+            if (invalidQuestions.Any())
+            {
+                return Response.Error(new Error { Detail = "Some questions do not belong to the selected subject/grade." });
+            }
+
+            e.title = dto.title;
+            e.description = dto.description;
+            e.grade_id = dto.grade_id;
+            e.subject_id = dto.subject_id;
+            e.duration_minutes = dto.duration_minutes > 0 ? dto.duration_minutes : e.duration_minutes;
+            e.pass_marks = dto.pass_marks;
+            e.exam_date = dto.exam_date;
+            e.exam_config_json = JsonConvert.SerializeObject(dto.sections);
+            e.updated_datetime = DateTime.Now;
+            e.updated_user_id = AuthUser.Id;
+
+            await _examDao.Update(e);
+
+            await _examQuestionDao.DeleteByExamId(e.id);
+
+            var allExamQuestions = new List<t_exam_question>();
+            decimal totalMarks = 0;
+
+            foreach (var section in dto.sections)
+            {
+                foreach (var q in section.questions.OrderBy(x => x.question_number))
+                {
+                    var questionEntity = questions.First(x => x.id == q.question_id);
+                    var marks = q.marks_allocated > 0 ? q.marks_allocated : questionEntity.default_marks;
+
+                    allExamQuestions.Add(new t_exam_question
+                    {
+                        exam_id = e.id,
+                        question_id = q.question_id,
+                        question_number = q.question_number,
+                        marks_allocated = marks,
+                        section_name = q.section_name ?? section.section_name,
+                        is_deleted = false,
+                        created_datetime = DateTime.Now
+                    });
+                    totalMarks += marks;
+                }
+            }
+
+            e.total_questions = allExamQuestions.Count;
+            e.total_marks = totalMarks;
+            await _examDao.Update(e);
+            await _examQuestionDao.AddRange(allExamQuestions);
+
+            return Response.Success(new { id = e.id, total_questions = e.total_questions, total_marks = e.total_marks });
         }
 
         public async Task<byte[]> ExportToPdfAsync(long examId, string printTemplateHtml)

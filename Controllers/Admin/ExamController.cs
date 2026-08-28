@@ -131,12 +131,16 @@ namespace ExamSystem.Controllers.Admin
         public async Task<IActionResult> Edit(long id)
         {
             ViewBag.FormTitle = "Edit Exam";
-            var resp = await _service.GetExamAsync(id);
+            ViewBag.QuestionTypes = ExamSystem.Constraints.QuestionTypes.AllTypes()
+                .Select(t => new { id = t, name = t.GetTypeName() })
+                .ToList();
+            var resp = await _service.GetExamWithQuestionsAsync(id);
             if (resp.Errors != null) return NotFound();
+            var dto = resp.Data as ExamResponseDto;
             await LoadViewBags();
-            var subjectResp = await _subjectService.GetByGradeIdAsync(((ExamResponseDto)resp.Data).grade_id);
+            var subjectResp = await _subjectService.GetByGradeIdAsync(dto.grade_id);
             ViewBag.Subjects = subjectResp.Data;
-            return View("~/Views/Exam/Edit.cshtml", resp.Data as ExamResponseDto);
+            return View("~/Views/Exam/Edit.cshtml", dto);
         }
 
         [HttpPost("exam/edit/{id}")]
@@ -161,6 +165,19 @@ namespace ExamSystem.Controllers.Admin
             }
             SuccessMessage("Exam updated successfully.");
             return !string.IsNullOrWhiteSpace(listingPageUrl) ? Redirect(listingPageUrl) : RedirectToAction("Index");
+        }
+
+        [HttpPost("exam/edit-questions/{id}")]
+        [RequestFormLimits(ValueCountLimit = 8192)]
+        public async Task<IActionResult> EditQuestions(long id, [FromBody] ManualExamGenerateRequestDto request)
+        {
+            var resp = await _service.UpdateExamManualAsync(id, request);
+            if (!resp.IsSuccess)
+            {
+                return Json(new { success = false, error = resp.Errors?.Detail ?? "Failed to update exam." });
+            }
+            var data = (dynamic)resp.Data;
+            return Json(new { success = true, id = data.id, total_questions = data.total_questions, total_marks = data.total_marks, redirect = $"/admin/exam/preview/{data.id}" });
         }
 
         [HttpGet("exam/delete/{id}")]

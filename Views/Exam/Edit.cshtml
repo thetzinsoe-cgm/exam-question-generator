@@ -1,96 +1,438 @@
 @model ExamSystem.DTOs.Exam.ExamResponseDto
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = (ViewBag.FormTitle ?? "Edit") + " Exam";
-    ViewData["HeaderTitle"] = ViewBag.FormTitle ?? "Edit Exam";
-    var listingPageUrl = Context.Request.Query["listingPageUrl"].FirstOrDefault() ?? "/admin/exam/index";
+    ViewData["Title"] = "Edit Exam - " + (Model?.exam_code ?? "");
+    ViewData["HeaderTitle"] = "Edit Exam";
     var grades = ViewBag.Grades as System.Collections.IEnumerable ?? new object[0];
-    var subjectList = ViewBag.Subjects as System.Collections.IEnumerable ?? new object[0];
+    var qTypes = (ViewBag.QuestionTypes as System.Collections.IEnumerable ?? new object[0]).Cast<dynamic>();
+    var listingPageUrl = Context.Request.Query["listingPageUrl"].FirstOrDefault() ?? "/admin/exam/index";
+
+    // Group existing questions by section, preserving order
+    var existingSections = new Dictionary<string, List<ExamSystem.DTOs.Exam.ExamQuestionDto>>();
+    foreach (var q in (Model.questions ?? new List<ExamSystem.DTOs.Exam.ExamQuestionDto>()).OrderBy(q => q.question_number))
+    {
+        var sec = string.IsNullOrWhiteSpace(q.section_name) ? "Section A" : q.section_name;
+        if (!existingSections.ContainsKey(sec)) existingSections[sec] = new List<ExamSystem.DTOs.Exam.ExamQuestionDto>();
+        existingSections[sec].Add(q);
+    }
 }
-<div class="row justify-content-center">
-    <div class="col-md-9 col-xl-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold"><i class="fas fa-edit mr-2 text-primary"></i>Edit Exam</h6>
-                <span class="badge badge-light border text-muted font-mono">Code: @Model.exam_code</span>
+<div class="row">
+    <div class="col-12">
+        <div class="card card-primary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0"><i class="fas fa-edit mr-2"></i>Edit Exam</h3>
+                <div>
+                    <span class="badge badge-light border text-muted mr-2">Code: @Model.exam_code</span>
+                    <span class="badge badge-pill badge-primary mr-2" id="globalQCount">@Model.total_questions questions</span>
+                    <span class="badge badge-pill badge-success" id="globalMarks">@Model.total_marks.ToString("0.##") marks</span>
+                </div>
             </div>
             <div class="card-body">
-                <form asp-action="Edit" method="post" class="row g-3">
-                    <input type="hidden" name="listingPageUrl" value="@listingPageUrl" />
-                    <div class="form-group col-md-6">
-                        <label>Grade / Level <span class="text-danger">*</span></label>
-                        <select name="grade_id" id="gradeSelect" class="form-control" required>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label for="title">Title <span class="text-danger">*</span></label>
+                        <input type="text" id="title" class="form-control" maxlength="255" required value="@Model.title" />
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="grade_id">Grade <span class="text-danger">*</span></label>
+                        <select id="grade_id" class="form-control" required>
+                            <option value="">-- Grade --</option>
                             @foreach (var g in System.Linq.Enumerable.Cast<dynamic>(grades))
                             {
-                                <option value="@g.id" selected="@(Model.grade_id == g.id)">@g.name</option>
+                                <option value="@g.id" selected="@(Model.grade_id == (long)g.id)">@g.name</option>
                             }
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>Subject <span class="text-danger">*</span></label>
-                        <select name="subject_id" id="subjectSelect" class="form-control" required>
-                            @foreach (var s in System.Linq.Enumerable.Cast<dynamic>(subjectList))
+                    <div class="form-group col-md-2">
+                        <label for="subject_id">Subject <span class="text-danger">*</span></label>
+                        <select id="subject_id" class="form-control" required>
+                            <option value="">-- Subject --</option>
+                            @foreach (var s in (ViewBag.Subjects as System.Collections.IEnumerable ?? new object[0]).Cast<dynamic>())
                             {
-                                <option value="@s.id" selected="@(Model.subject_id == s.id)">@s.name</option>
+                                <option value="@s.id" selected="@(Model.subject_id == (long)s.id)">@s.name</option>
                             }
                         </select>
                     </div>
-                    <div class="form-group col-12">
-                        <label>Exam Title <span class="text-danger">*</span></label>
-                        <input type="text" name="title" value="@Model.title" class="form-control" required maxlength="255" />
+                    <div class="form-group col-md-2">
+                        <label for="exam_date">Exam Date</label>
+                        <input type="date" id="exam_date" class="form-control" value="@Model.exam_date?.ToString("yyyy-MM-dd")" />
                     </div>
-                    <div class="form-group col-12">
-                        <label>Description</label>
-                        <textarea name="description" class="form-control" rows="3" maxlength="500">@Model.description</textarea>
+                    <div class="form-group col-md-2">
+                        <label for="duration_minutes">Duration (min)</label>
+                        <input type="number" id="duration_minutes" min="1" class="form-control" value="@Model.duration_minutes" />
                     </div>
-                    <div class="form-group col-md-4">
-                        <label>Duration (minutes) <span class="text-danger">*</span></label>
-                        <input type="number" min="1" name="duration_minutes" value="@Model.duration_minutes" class="form-control" required />
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-3">
+                        <label for="pass_marks">Pass Marks</label>
+                        <input type="number" id="pass_marks" step="0.01" min="0" class="form-control" value="@Model.pass_marks" />
                     </div>
-                    <div class="form-group col-md-4">
-                        <label>Pass Marks</label>
-                        <input type="number" step="0.01" min="0" name="pass_marks" value="@Model.pass_marks" class="form-control" />
+                    <div class="form-group col-md-9">
+                        <label for="description">Description / Instructions</label>
+                        <textarea id="description" class="form-control" rows="2" maxlength="1000">@Model.description</textarea>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label>Exam Date</label>
-                        <input type="date" name="exam_date" value="@Model.exam_date?.ToString("yyyy-MM-dd")" class="form-control" />
-                    </div>
-                    <div class="form-group col-md-6 align-self-end pb-2">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" name="is_active" value="true" class="custom-control-input" id="isActive" @(Model.is_active ? "checked" : "") />
-                            <label class="custom-control-label" for="isActive"><strong>Active Status</strong></label>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6 text-right align-self-end pb-2">
-                        <small class="text-muted">Total Marks: <strong>@Model.total_marks.ToString("0.##")</strong> | Questions: <strong>@Model.total_questions</strong></small>
-                    </div>
-                    <div class="col-12 pt-3 border-top">
-                        <button type="submit" class="btn btn-primary px-4" id="saveBtn"><i class="fas fa-save mr-1"></i>Update Exam</button>
-                        <a href="@listingPageUrl" class="btn btn-outline-secondary px-4 ml-1">Cancel</a>
-                        <div asp-validation-summary="All" class="text-danger mt-3"></div>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <h5 class="mb-0"><i class="fas fa-layer-group mr-1 text-info"></i>Sections</h5>
+                <button type="button" class="btn btn-sm btn-success" id="addSectionBtn"><i class="fas fa-plus mr-1"></i>Add Section</button>
+            </div>
+            <div class="card-body" id="sectionsContainer">
+                @if (!existingSections.Any())
+                {
+                    <div class="alert alert-warning mb-0"><i class="fas fa-exclamation-triangle mr-1"></i>No questions in this exam yet. Add questions from the bank.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+    <a href="@listingPageUrl" class="btn btn-outline-secondary"><i class="fas fa-arrow-left mr-1"></i>Back to Exams</a>
+    <button type="button" class="btn btn-primary btn-lg" id="saveBtn"><i class="fas fa-save mr-1"></i>Update Exam</button>
+</div>
+<div id="examFormMsg" class="mt-3 text-danger" role="alert" aria-live="assertive"></div>
+
+@section HeadCss {
+<style>
+    .question-card { cursor: pointer; transition: border-color .15s ease; }
+    .question-card.selected { border-color: #007bff !important; background: #eef4ff; }
+    .q-bank-item { border: 1px solid #dee2e6; border-radius: .375rem; padding: .5rem .75rem; margin-bottom: .5rem; cursor: pointer; background:#fff; transition: box-shadow .15s ease; }
+    .q-bank-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+    .q-bank-item.selected { border-color: #007bff; background:#f0f6ff; }
+    .q-bank-item .q-text { font-size:.85rem; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .section-card { border:1px solid #dee2e6; border-radius:.5rem; margin-bottom:1rem; background:#f8f9fa; }
+    .section-card .section-head { padding:.6rem 1rem; background:#e9ecef; border-bottom:1px solid #dee2e6; border-radius:.5rem .5rem 0 0; display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
+    .section-card .section-body { padding:.75rem; min-height:60px; }
+    .qs-sortable { min-height:40px; }
+    .q-row { display:flex; align-items:center; gap:.5rem; background:#fff; border:1px solid #dee2e6; border-radius:.375rem; padding:.4rem .6rem; margin-bottom:.4rem; }
+    .q-row .drag-handle { cursor:grab; color:#adb5bd; }
+    .q-row .q-info { flex:1; min-width:0; }
+    .q-row .q-info .t { font-size:.82rem; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .q-row .q-info .m { font-size:.7rem; color:#6c757d; }
+    .q-row .marks-input { width:70px; }
+    .q-row .q-num { font-weight:700; color:#007bff; width:28px; text-align:center; }
+    .qs-sortable li.placeholder, .qs-sortable .sortable-ghost { opacity:.4; background:#dee2e6; }
+    .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1040; }
+    .drawer-overlay.show { display:block; }
+    .q-drawer { position:fixed; top:0; right:0; width:460px; max-width:92vw; height:100vh; background:#fff; z-index:1050; transform:translateX(100%); transition:transform .3s ease; box-shadow:-4px 0 16px rgba(0,0,0,.15); display:flex; flex-direction:column; }
+    .q-drawer.open { transform:translateX(0); }
+    .q-drawer .drawer-header { padding:.9rem 1rem; background:#343a40; color:#fff; display:flex; justify-content:space-between; align-items:center; }
+    .q-drawer .drawer-body { flex:1; overflow-y:auto; padding:1rem; }
+    .q-drawer .drawer-footer { padding:.75rem 1rem; border-top:1px solid #dee2e6; }
+    .type-badge { font-size:.7rem; padding:.2em .55em; }
+</style>
+}
+
 @section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
+    var selState = {
+        subject_id: @Model.subject_id,
+        grade_id: @Model.grade_id,
+        search: '', type: '', difficulty: ''
+    };
+    var selPage = 1;
+    var selTotalPages = 0;
+    var selectedQIds = {};
+    var selectedBankMap = {};
+
+    var INITIAL_SECTIONS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(existingSections.Select(kv => new { section_name = kv.Key, questions = kv.Value.Select(q => new { qid = (long)q.question_id, text = q.question_text, type = (short)q.question_type, diff = 2, marks = q.marks_allocated }) }) ));
+
+    function qTypeName(v) { var m = {1:'MC',2:'T/F',3:'Short',4:'Essay',5:'Math',6:'BIO',7:'ECO',8:'Fill'}; return m[v] || ('Type '+v); }
+    function diffName(v){ return v==1?'Easy':v==3?'Hard':'Medium'; }
+    function esc(s){ return $('<div>').text(s||'').html(); }
+
+    var sIdx = 0;
+    function sectionTemplate(idx, name) {
+        return `
+        <div class="section-card" data-idx="${idx}">
+            <div class="section-head" data-toggle="collapse" data-target="#secBody-${idx}" role="button" aria-expanded="true">
+                <i class="fas fa-grip-vertical"></i>
+                <input type="text" class="form-control form-control-sm sec-name" style="max-width:220px" value="${esc(name || ('Section ' + (idx+1)))}" onclick="event.stopPropagation()" />
+                <span class="badge badge-secondary badge-pill sec-count-badge">0 Q</span>
+                <span class="badge badge-info badge-pill sec-marks-badge">0 marks</span>
+                <button type="button" class="btn btn-sm btn-outline-danger ml-auto removeSec" onclick="event.stopPropagation()"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="collapse show" id="secBody-${idx}">
+                <div class="section-body">
+                    <ul class="list-unstyled qs-sortable mb-2" data-sec-idx="${idx}"></ul>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-sm btn-outline-primary addQtoSec" data-sec-idx="${idx}"><i class="fas fa-plus mr-1"></i>Add Questions from Bank</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+    function qRowTemplate(q, num) {
+        return `
+        <li class="q-row" data-qid="${q.qid}">
+            <span class="drag-handle" title="Drag to reorder"><i class="fas fa-grip-vertical"></i></span>
+            <span class="q-num">${num}.</span>
+            <div class="q-info">
+                <p class="t" title="${esc(q.text)}">${esc(q.text)}</p>
+                <span class="badge badge-secondary type-badge mr-1">${esc(qTypeName(q.type))}</span>
+                <span class="badge badge-${q.diff==3?'danger':q.diff==1?'success':'warning'} type-badge mr-1">${esc(diffName(q.diff))}</span>
+            </div>
+            <div class="input-group input-group-sm" style="width:110px">
+                <div class="input-group-prepend"><span class="input-group-text">+</span></div>
+                <input type="number" step="0.01" min="0" class="form-control marks-input" value="${q.marks > 0 ? q.marks : 1}" />
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger removeQ" title="Remove"><i class="fas fa-times"></i></button>
+        </li>`;
+    }
+    function addSection(name, questions) {
+        name = name || ('Section ' + ('ABCDEFGH'[(sIdx) % 8] || (sIdx+1)));
+        $('#sectionsContainer').find('.alert').remove();
+        $('#sectionsContainer').append(sectionTemplate(sIdx, name));
+        initSectionSortable(sIdx);
+        var idx = sIdx;
+        (questions || []).forEach(function (q) {
+            selectedQIds[q.qid] = true;
+            selectedBankMap[q.qid] = q;
+            $('.qs-sortable[data-sec-idx="'+idx+'"]').append(qRowTemplate(q, $('.qs-sortable[data-sec-idx="'+idx+'"] .q-row').length + 1));
+        });
+        sIdx++;
+        renumberAll();
+        updateSectionBadges();
+        updateGlobal();
+    }
+    function initSectionSortable(idx) {
+        var el = $('.qs-sortable[data-sec-idx="'+idx+'"]')[0];
+        if (!el) return;
+        new Sortable(el, {
+            group: { name: 'qs', pull: true, put: true },
+            handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
+            onEnd: function () { renumberAll(); updateSectionBadges(); updateGlobal(); }
+        });
+    }
+    function renumberAll() {
+        $('.section-card').each(function () {
+            $(this).find('.q-row').each(function (i) { $(this).find('.q-num').text((i+1) + '.'); });
+        });
+    }
+    function updateSectionBadges() {
+        $('.section-card').each(function () {
+            var rows = $(this).find('.q-row');
+            var marks = 0;
+            rows.each(function () { marks += parseFloat($(this).find('.marks-input').val()) || 0; });
+            $(this).find('.sec-count-badge').text(rows.length + ' Q');
+            $(this).find('.sec-marks-badge').text(marks + ' marks');
+        });
+    }
+    function updateGlobal() {
+        var totalQ = 0, totalMarks = 0;
+        $('.section-card').each(function () {
+            totalQ += $(this).find('.q-row').length;
+            $(this).find('.q-row').each(function () { totalMarks += parseFloat($(this).find('.marks-input').val()) || 0; });
+        });
+        $('#globalQCount').text(totalQ + ' questions');
+        $('#globalMarks').text(totalMarks + ' marks');
+    }
+
+    function openDrawer() {
+        if (!$('#grade_id').val() || !$('#subject_id').val()) { $('#examFormMsg').text('Please select a Grade and Subject first.'); return; }
+        loadBank();
+        $('#drawerOverlay').addClass('show');
+        $('#qDrawer').addClass('open');
+    }
+    function closeDrawer() { $('#drawerOverlay').removeClass('show'); $('#qDrawer').removeClass('open'); }
+    function loadBank() {
+        var params = { subject_id: $('#subject_id').val(), grade_id: $('#grade_id').val(), search: selState.search, question_type: selState.type, difficulty: selState.difficulty, page_number: selPage, page_size: 20 };
+        $('#bankList').html('<div class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin mr-1"></i>Loading...</div>');
+        $('#bankSelCount').text('0 selected');
+        $('#bankCheckAll').prop('checked', false);
+        $.getJSON('/admin/question/search', params, function (res) {
+            var d = res.data || {};
+            var items = d.questions || [];
+            selTotalPages = d.total_pages || 0;
+            if (!items.length) { $('#bankList').html('<div class="text-center text-muted py-4">No questions found.</div>'); }
+            else {
+                var html = items.map(function (q) {
+                    var isSel = !!selectedQIds[q.id];
+                    return `<div class="q-bank-item ${isSel?'selected':''}" data-qid="${q.id}" data-json='${esc(JSON.stringify({qid:q.id,text:q.question_text,type:q.question_type,diff:q.difficulty,marks:q.default_marks}))}'>
+                        <p class="q-text">${esc(q.question_text)}</p>
+                        <div><span class="badge badge-secondary type-badge mr-1">${esc(qTypeName(q.question_type))}</span>
+                        <span class="badge badge-${q.difficulty==3?'danger':q.difficulty==1?'success':'warning'} type-badge mr-1">${esc(diffName(q.difficulty))}</span>
+                        <span class="badge badge-light type-badge">${q.default_marks>0?q.default_marks+' pts':'-'}</span></div>
+                    </div>`;
+                }).join('');
+                $('#bankList').html(html);
+            }
+            $('#bankTotal').text('(' + (d.total||0) + ' found)');
+            $('#bankPageLeft').prop('disabled', selPage<=1);
+            $('#bankPageRight').prop('disabled', selPage>=selTotalPages);
+            $('#bankPageInfo').text('Page ' + selPage + ' / ' + (selTotalPages||1));
+        }).fail(function () { $('#bankList').html('<div class="text-center text-danger py-4">Failed to load questions.</div>'); });
+    }
+    function addSelectedToSection(secIdx) {
+        var picked = [];
+        $('#bankList .q-bank-item.selected').each(function () {
+            var json = $(this).attr('data-json');
+            try { picked.push(JSON.parse(json)); } catch (e) { }
+        });
+        if (!picked.length) { alert('Select at least one question in the bank first.'); return; }
+        var secEl = $('.qs-sortable[data-sec-idx="'+secIdx+'"]');
+        var existing = {};
+        secEl.find('.q-row').each(function(){ existing[$(this).data('qid')] = true; });
+        var added = 0;
+        picked.forEach(function (q) {
+            if (existing[q.qid]) return;
+            selectedQIds[q.qid] = true;
+            selectedBankMap[q.qid] = q;
+            secEl.append(qRowTemplate(q, secEl.find('.q-row').length + 1));
+            added++;
+        });
+        $('#bankList .q-bank-item.selected').removeClass('selected');
+        if (added) { renumberAll(); updateSectionBadges(); updateGlobal(); }
+    }
+    function openDrawerForSection(secIdx) { window._targetSecIdx = secIdx; openDrawer(); }
+
     $(function () {
-        $('#gradeSelect').change(function () {
+        $('#grade_id').change(function () {
             var gid = $(this).val();
-            $.getJSON('/admin/exam/subjects-by-grade?grade_id=' + gid, function (data) {
+            $('#subject_id').empty().append('<option value="">-- Subject --');
+            if (!gid) return;
+            $.getJSON('/admin/question/subjects-by-grade?grade_id=' + gid, function (data) {
                 var list = data.data || data || [];
-                var sel = $('#subjectSelect').empty();
-                list.forEach(function (s) { sel.append($('<option>', { value: s.id, text: s.name })); });
-            }).fail(function () { console.error('Failed to load subjects by grade.'); });
+                list.forEach(function (s) { $('#subject_id').append($('<option>', { value: s.id, text: s.name })); });
+            });
         });
 
-        $('form').on('submit', function () {
-            var btn = $('#saveBtn');
-            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Saving...');
+        $('#addSectionBtn').on('click', function () { addSection(); });
+        $(document).on('click', '.removeSec', function () { $(this).closest('.section-card').remove(); updateGlobal(); });
+        $(document).on('click', '.removeQ', function () {
+            var qid = parseInt($(this).closest('.q-row').data('qid'),10);
+            delete selectedQIds[qid];
+            $(this).closest('.q-row').remove();
+            renumberAll(); updateSectionBadges(); updateGlobal();
         });
+        $(document).on('input blur', '.marks-input', function () { updateSectionBadges(); updateGlobal(); });
+        $(document).on('click', '.addQtoSec', function () { openDrawerForSection(parseInt($(this).data('sec-idx'),10)); });
+
+        $('#closeDrawer').on('click', closeDrawer);
+        $('#drawerOverlay').on('click', closeDrawer);
+        $('#bankSearch').on('keydown', function (e) { if (e.key === 'Enter') { selState.search = this.value; selPage=1; loadBank(); } });
+        $('#bankSearchBtn').on('click', function () { selState.search = $('#bankSearch').val(); selPage=1; loadBank(); });
+        $('#bankType').on('change', function () { selState.type = this.value; selPage=1; loadBank(); });
+        $('#bankDiff').on('change', function () { selState.difficulty = this.value; selPage=1; loadBank(); });
+        $('#bankPageLeft').on('click', function () { if (selPage>1){ selPage--; loadBank(); } });
+        $('#bankPageRight').on('click', function () { if (selPage<selTotalPages){ selPage++; loadBank(); } });
+        $('#bankCheckAll').on('change', function () { $('#bankList .q-bank-item').toggleClass('selected', this.checked); updateBankSelCount(); });
+        $('#bankList').on('click', '.q-bank-item', function () { $(this).toggleClass('selected'); updateBankSelCount(); });
+        function updateBankSelCount() {
+            $('#bankSelCount').text($('#bankList .q-bank-item.selected').length + ' selected');
+            var n = $('#bankList .q-bank-item').length;
+            $('#bankCheckAll').prop('checked', n>0 && $('#bankList .q-bank-item.selected').length === n);
+        }
+        $('#bankAddSelected').on('click', function () {
+            var secIdx = window._targetSecIdx != null ? window._targetSecIdx : ($('.section-card').length ? 0 : -1);
+            if (secIdx < 0) { alert('Please add a section first.'); return; }
+            addSelectedToSection(secIdx);
+        });
+
+        // Save
+        $('#saveBtn').on('click', function () {
+            $('#examFormMsg').text('');
+            var title = $('#title').val().trim();
+            var grade_id = $('#grade_id').val();
+            var subject_id = $('#subject_id').val();
+            if (!title) { $('#examFormMsg').text('Please enter a title.'); return; }
+            if (!grade_id || !subject_id) { $('#examFormMsg').text('Please select Grade and Subject.'); return; }
+
+            var sections = [];
+            var hasQ = false;
+            $('#sectionsContainer .section-card').each(function () {
+                var secName = $(this).find('.sec-name').val().trim() || ('Section ' + ($(this).index()+1));
+                var qs = [];
+                $(this).find('.q-row').each(function (i) {
+                    var qid = parseInt($(this).data('qid'),10);
+                    var marks = parseFloat($(this).find('.marks-input').val()) || 0;
+                    qs.push({ question_id: qid, question_number: i+1, marks_allocated: marks, section_name: secName });
+                    hasQ = true;
+                });
+                sections.push({ section_name: secName, questions: qs });
+            });
+            if (!sections.length || !hasQ) { $('#examFormMsg').text('Add at least one question to a section.'); return; }
+
+            var payload = {
+                title: title,
+                description: $('#description').val(),
+                subject_id: parseInt(subject_id,10),
+                grade_id: parseInt(grade_id,10),
+                duration_minutes: parseInt($('#duration_minutes').val()) || 120,
+                pass_marks: parseFloat($('#pass_marks').val()) || 0,
+                exam_date: $('#exam_date').val() || null,
+                sections: sections
+            };
+            var btn = $(this);
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Saving...');
+            $.ajax({
+                url: '/admin/exam/edit-questions/@Model.id',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    if (res.success && res.redirect) { window.location.href = res.redirect; }
+                    else { btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Update Exam'); $('#examFormMsg').text(res.error || 'Failed to update exam.'); }
+                },
+                error: function (xhr) {
+                    btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Update Exam');
+                    $('#examFormMsg').text((xhr.responseJSON && xhr.responseJSON.error) || 'Server error. Please try again.');
+                }
+            });
+        });
+
+        // Pre-populate sections from existing questions
+        if (INITIAL_SECTIONS && INITIAL_SECTIONS.length) {
+            INITIAL_SECTIONS.forEach(function (s) { addSection(s.section_name, s.questions); });
+        } else {
+            addSection('Section A');
+        }
     });
+    window.addSection = addSection;
+    window.closeDrawer = closeDrawer;
 </script>
 }
+
+<!-- Drawer markup -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="q-drawer" id="qDrawer" aria-label="Question bank">
+    <div class="drawer-header">
+        <h6 class="mb-0"><i class="fas fa-question-circle mr-1"></i>Question Bank</h6>
+        <button type="button" class="close text-white" id="closeDrawer" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div>
+    <div class="drawer-body">
+        <div class="row mb-2">
+            <div class="col-8"><input type="text" id="bankSearch" class="form-control form-control-sm" placeholder="Search questions..." /></div>
+            <div class="col-4"><button type="button" class="btn btn-sm btn-outline-primary btn-block" id="bankSearchBtn"><i class="fas fa-search"></i></button></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6"><select id="bankType" class="form-control form-control-sm"><option value="">All Types</option>
+                @foreach (var t in qTypes) { <option value="@t.id">@t.name</option> }
+            </select></div>
+            <div class="col-6"><select id="bankDiff" class="form-control form-control-sm"><option value="">All Difficulty</option><option value="1">Easy</option><option value="2">Medium</option><option value="3">Hard</option></select></div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="mb-0 small"><input type="checkbox" id="bankCheckAll" /> Select all on page</label>
+            <span class="small text-muted" id="bankTotal"></span>
+        </div>
+        <div id="bankList"></div>
+        <div class="d-flex justify-content-center align-items-center mt-3">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="bankPageLeft"><i class="fas fa-chevron-left"></i></button>
+            <span class="mx-3" id="bankPageInfo"></span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="bankPageRight"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="drawer-footer d-flex align-items-center">
+        <span class="mr-auto text-muted small" id="bankSelCount">0 selected</span>
+        <button type="button" class="btn btn-primary btn-sm" id="bankAddSelected"><i class="fas fa-plus mr-1"></i>Add to Section</button>
+    </div>
+</div>
