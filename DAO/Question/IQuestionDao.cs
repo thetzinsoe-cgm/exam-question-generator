@@ -13,5 +13,6 @@ namespace ExamSystem.DAO.Question
         Task Delete(m_question question);
         Task<bool> QuestionExists(long id);
         Task<List<m_question>> GetRandomQuestionsBySubjectAndType(long subjectId, short questionType, short? difficulty, int count);
+        Task<List<m_question>> GetByIdsAsync(List<long> ids);
     }
 }

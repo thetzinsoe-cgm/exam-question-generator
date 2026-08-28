@@ -21,6 +21,7 @@ namespace ExamSystem.Services.Question
         Task<Response> DeleteQuestionAsync(long id);
         Task<string> SaveQuestionImageAsync(Stream stream, string fileName);
         Task<BulkImportResultDto> BulkImportFromExcelAsync(Stream excelStream, long subjectId, long gradeId);
+        Task<DTOs.Exam.QuestionSearchResponseDto> SearchQuestionsAsync(DTOs.Exam.QuestionSearchRequestDto request);
     }
 
     public class QuestionService : IQuestionService
@@ -311,6 +312,75 @@ namespace ExamSystem.Services.Question
                     marks_allocated = a.marks_allocated,
                     sort_order = a.sort_order
                 }).ToList() ?? new List<AnswerOptionDto>()
+            };
+        }
+
+        public async Task<DTOs.Exam.QuestionSearchResponseDto> SearchQuestionsAsync(DTOs.Exam.QuestionSearchRequestDto request)
+        {
+            if (request.page_number < 1) request.page_number = 1;
+            if (request.page_size < 1) request.page_size = 20;
+            if (request.page_size > 100) request.page_size = 100;
+
+            var query = _dao.GetAll()
+                .Where(q => q.subject_id == request.subject_id && q.grade_id == request.grade_id && q.is_active);
+
+            if (!string.IsNullOrWhiteSpace(request.search))
+            {
+                var s = request.search.Trim().ToLower();
+                query = query.Where(q => q.question_text.ToLower().Contains(s));
+            }
+
+            if (request.question_type.HasValue)
+            {
+                query = query.Where(q => q.question_type == request.question_type.Value);
+            }
+
+            if (request.difficulty.HasValue)
+            {
+                query = query.Where(q => q.difficulty == request.difficulty.Value);
+            }
+
+            var total = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)total / request.page_size);
+
+            var items = await query
+                .OrderByDescending(q => q.id)
+                .Skip((request.page_number - 1) * request.page_size)
+                .Take(request.page_size)
+                .ToListAsync();
+
+            var questions = items.Select(q => new DTOs.Exam.QuestionSearchDto
+            {
+                id = q.id,
+                question_text = q.question_text,
+                question_html = q.question_html,
+                question_type = q.question_type,
+                question_type_name = q.question_type.GetTypeName(),
+                difficulty = q.difficulty,
+                difficulty_name = GetDifficultyName(q.difficulty),
+                default_marks = q.default_marks,
+                image_url = q.image_url,
+                has_answer_options = q.answer_options != null && q.answer_options.Any(a => !a.is_deleted)
+            }).ToList();
+
+            return new DTOs.Exam.QuestionSearchResponseDto
+            {
+                questions = questions,
+                total = total,
+                page_number = request.page_number,
+                page_size = request.page_size,
+                total_pages = totalPages
+            };
+        }
+
+        private static string GetDifficultyName(short difficulty)
+        {
+            return difficulty switch
+            {
+                1 => "Easy",
+                2 => "Medium",
+                3 => "Hard",
+                _ => "Medium"
             };
         }
     }

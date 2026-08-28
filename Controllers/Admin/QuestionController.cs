@@ -1,5 +1,6 @@
 using ExamSystem.Attributes;
 using ExamSystem.Constraints;
+using ExamSystem.DTOs.Exam;
 using ExamSystem.DTOs.Question;
 using ExamSystem.Exceptions;
 using ExamSystem.Helpers;
@@ -219,6 +220,13 @@ namespace ExamSystem.Controllers.Admin
                 ErrorMessage(ex.Message);
             }
             return View("~/Views/Question/BulkImport.cshtml");
+        }
+
+        [HttpGet("question/search")]
+        public async Task<IActionResult> Search([FromQuery] QuestionSearchRequestDto request)
+        {
+            var resp = await _service.SearchQuestionsAsync(request);
+            return Json(new { success = true, data = resp });
         }
     }
 }

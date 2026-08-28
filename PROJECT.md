@@ -7,7 +7,7 @@
 **Exam Management System** — an ASP.NET Core 8 MVC admin web app for building and managing exam papers:
 
 - Manage **Grades**, **Subjects**, a **Question Bank** (with answers, images, ECO tables), and **Marking Rules**
-- **Generate exams** by selecting grade/subject/marking rules → auto-pick questions
+- **Generate exams** by selecting grade/subject → build sections → **manually pick questions from the bank** into each section (side drawer search/filter), set per-question marks, drag-drop reorder within/between sections → real-time totals
 - **Preview** an exam, then **export it as PDF** (WkHtmlToPdf) with an HTML fallback renderer
 - Admin login (cookie session) + JWT tokens for API clients
 - Dashboard with stats

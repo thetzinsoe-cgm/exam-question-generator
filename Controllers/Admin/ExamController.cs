@@ -68,6 +68,9 @@ namespace ExamSystem.Controllers.Admin
         public async Task<IActionResult> Generate()
         {
             ViewBag.FormTitle = "Generate New Exam";
+            ViewBag.QuestionTypes = ExamSystem.Constraints.QuestionTypes.AllTypes()
+                .Select(t => new { id = t, name = t.GetTypeName() })
+                .ToList();
             await LoadViewBags();
             return View("~/Views/Exam/Generate.cshtml");
         }
@@ -96,6 +99,24 @@ namespace ExamSystem.Controllers.Admin
             SuccessMessage("Exam generated successfully.");
             dynamic meta = resp.Meta ?? new { };
             return RedirectToAction("Preview", new { id = ((dynamic)resp.Data).id });
+        }
+
+        [HttpPost("exam/generate-manual")]
+        [RequestFormLimits(ValueCountLimit = 8192)]
+        public async Task<IActionResult> GenerateManual([FromBody] ManualExamGenerateRequestDto request)
+        {
+            if (!ModelState.IsValid) 
+            { 
+                await LoadViewBags(); 
+                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) }); 
+            }
+            var resp = await _service.GenerateExamManualAsync(request);
+            if (!resp.IsSuccess)
+            {
+                return Json(new { success = false, error = resp.Errors?.Detail ?? "Failed to generate exam." });
+            }
+            var data = (dynamic)resp.Data;
+            return Json(new { success = true, id = data.id, exam_code = data.exam_code, redirect = $"/admin/exam/preview/{data.id}" });
         }
 
         [HttpGet("exam/preview/{id}")]

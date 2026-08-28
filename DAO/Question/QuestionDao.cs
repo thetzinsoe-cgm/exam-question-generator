@@ -84,5 +84,15 @@ namespace ExamSystem.DAO.Question
                 .Take(count)
                 .ToListAsync();
         }
+
+        public Task<List<m_question>> GetByIdsAsync(List<long> ids)
+        {
+            return _context.m_questions
+                .Include(q => q.answer_options.Where(a => !a.is_deleted))
+                .Include(q => q.subject)
+                .Include(q => q.grade)
+                .Where(q => ids.Contains(q.id) && !q.is_deleted)
+                .ToListAsync();
+        }
     }
 }

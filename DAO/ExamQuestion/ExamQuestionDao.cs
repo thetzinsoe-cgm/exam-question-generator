@@ -30,5 +30,25 @@ namespace ExamSystem.DAO.ExamQuestion
             _context.t_exam_questions.UpdateRange(records);
             await _context.SaveChangesAsync();
         }
+
+        public Task<List<t_exam_question>> GetByExamId(long examId)
+        {
+            return _context.t_exam_questions
+                .Include(eq => eq.question)
+                    .ThenInclude(q => q.answer_options.Where(a => !a.is_deleted))
+                .Include(eq => eq.question)
+                    .ThenInclude(q => q.subject)
+                .Include(eq => eq.question)
+                    .ThenInclude(q => q.grade)
+                .Where(eq => eq.exam_id == examId && !eq.is_deleted)
+                .OrderBy(eq => eq.question_number)
+                .ToListAsync();
+        }
+
+        public async Task UpdateRange(IEnumerable<t_exam_question> questions)
+        {
+            _context.t_exam_questions.UpdateRange(questions);
+            await _context.SaveChangesAsync();
+        }
     }
 }
