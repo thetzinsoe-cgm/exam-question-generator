@@ -1,14 +1,14 @@
 # PROJECT.md — Exam System
 
-> Read this first in every session. Last updated: 2026-08-26
+> Read this first in every session. Last updated: 2026-08-28
 
 ## What This Is
 
 **Exam Management System** — an ASP.NET Core 8 MVC admin web app for building and managing exam papers:
 
 - Manage **Grades**, **Subjects**, a **Question Bank** (with answers, images, ECO tables), and **Marking Rules**
-- **Generate exams** by selecting grade/subject → build sections → **manually pick questions from the bank** into each section (side drawer search/filter), set per-question marks, drag-drop reorder within/between sections → real-time totals. The **Edit** page reuses the same two-pane builder to manage an exam's questions (reloads `t_exam_question`, add/remove/reorder/marks)
-- **Preview** an exam, then **export it as PDF** (WkHtmlToPdf) with an HTML fallback renderer
+- **Generate exams** by selecting grade/subject → build sections → **manually pick questions from the bank** into each section (side drawer search/filter), set per-question marks, drag-drop reorder within/between sections → real-time totals. The **Edit** page reuses the same two-pane builder to manage an exam's questions (reloads `t_exam_question`, add/remove/reorder/marks), and the **Preview** toolbar links back to Edit ("Edit Exam") for edit/regenerate-from-preview
+- **Preview** an exam, then **export it as PDF** (WkHtmlToPdf) with an HTML fallback renderer. The PDF template (`Views/Exam/PrintTemplate.cshtml`) matches a Burmese ministry paper's visual style (centered board header, subject + right-aligned time, right-aligned `(N) မှတ်` section marks, Myanmar-digit item numbering per section, inline MC options, bordered term/ECO tables, `[တစ်ဖက်သို့]` turn notes). Phase 5 reproduced the full sample Economics paper (4-page A4 PDF; exam id 8 `EX-ECO-SAMPLE-2026` "ဘောဂဗေဒ", 100 marks) and recorded an OK/NOT-OK comparison in `SampleData/COMPARISON.md`
 - Admin login (cookie session) + JWT tokens for API clients
 - Dashboard with stats
 
