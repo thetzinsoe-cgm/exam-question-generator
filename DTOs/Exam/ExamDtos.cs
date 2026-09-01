@@ -27,12 +27,13 @@ namespace ExamSystem.DTOs.Exam
             set => _description = value?.Trim();
         }
 
+        public string exam_year { get; set; }
+        public string examination_center { get; set; }
         public long subject_id { get; set; }
         public long grade_id { get; set; }
         public int total_questions { get; set; }
         public int duration_minutes { get; set; }
         public decimal pass_marks { get; set; }
-        public DateTime? exam_date { get; set; }
         public List<ExamSectionDto> sections { get; set; } = new List<ExamSectionDto>();
         public bool use_marking_rules { get; set; } = true;
         public bool randomize_questions { get; set; } = true;
@@ -52,6 +53,8 @@ namespace ExamSystem.DTOs.Exam
         public long id { get; set; }
         public string exam_code { get; set; }
         public string title { get; set; }
+        public string exam_year { get; set; }
+        public string examination_center { get; set; }
         public long subject_id { get; set; }
         public string subject_name { get; set; }
         public long grade_id { get; set; }
@@ -60,7 +63,6 @@ namespace ExamSystem.DTOs.Exam
         public int duration_minutes { get; set; }
         public decimal total_marks { get; set; }
         public decimal pass_marks { get; set; }
-        public DateTime? exam_date { get; set; }
         public string description { get; set; }
         public bool is_active { get; set; }
         public DateTime created_datetime { get; set; }
@@ -101,11 +103,12 @@ namespace ExamSystem.DTOs.Exam
             set => _description = value?.Trim();
         }
 
+        public string exam_year { get; set; }
+        public string examination_center { get; set; }
         public long subject_id { get; set; }
         public long grade_id { get; set; }
         public int duration_minutes { get; set; }
         public decimal pass_marks { get; set; }
-        public DateTime? exam_date { get; set; }
         public List<ManualExamSectionDto> sections { get; set; } = new List<ManualExamSectionDto>();
     }
 

@@ -34,10 +34,14 @@
     var sb = new StringBuilder();
 
     // ---- Board header (sample style) ----
+    var boardYear = string.IsNullOrWhiteSpace(Model.exam_year) ? "၂၀၂၆ ခုနှစ်" : Model.exam_year;
+    var boardName = string.IsNullOrWhiteSpace(Model.title) ? "တက္ကသိုလ်ဝင်စာမေးပွဲ" : Model.title;
+    var boardCenter = string.IsNullOrWhiteSpace(Model.examination_center) ? "မြန်မာနိုင်ငံစာစစ်ဦးစီးဌာန" : Model.examination_center;
+
     sb.Append("<div class=\"board\">");
-    sb.Append("<div class=\"line1\">၂၀၂၆ ခုနှစ်</div>");
-    sb.Append("<div class=\"line2\">တက္ကသိုလ်ဝင်စာမေးပွဲ</div>");
-    sb.Append("<div class=\"line2\">မြန်မာနိုင်ငံစာစစ်ဦးစီးဌာန</div>");
+    sb.Append("<div class=\"line1\">" + System.Web.HttpUtility.HtmlEncode(boardYear) + "</div>");
+    sb.Append("<div class=\"line2\">" + System.Web.HttpUtility.HtmlEncode(boardName) + "</div>");
+    sb.Append("<div class=\"line2\">" + System.Web.HttpUtility.HtmlEncode(boardCenter) + "</div>");
     sb.Append("<div class=\"subject-row\">");
     var subjName = string.IsNullOrWhiteSpace(Model.title) ? Model.subject_name : Model.title;
     sb.Append("<span class=\"time\">ခွင့်ပြုချိန် " + (Model.duration_minutes > 0 ? MmDigit(toHours(Model.duration_minutes)) + " နာရီ" : "………… နာရီ") + "</span>");
@@ -130,7 +134,7 @@
         @@page { size: A4 portrait; margin: 15mm 15mm 18mm 15mm; }
         * { box-sizing: border-box; }
         html, body {
-            font-family: 'Pyidaungsu','Noto Sans Myanmar','Myanmar3','Padauk','WinResearcher','Arial Unicode MS','Segoe UI Historic',Tahoma,Arial,sans-serif;
+            font-family: 'PadaukEmbedded','Padauk','Pyidaungsu','Noto Sans Myanmar','Myanmar3','WinResearcher','Arial Unicode MS','Segoe UI Historic',Tahoma,Arial,sans-serif;
             font-size: 11.5pt; color: #000; line-height: 1.35;
         }
         body { margin: 0; padding: 0; }

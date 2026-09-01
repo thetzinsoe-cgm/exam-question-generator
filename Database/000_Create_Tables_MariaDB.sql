@@ -444,6 +444,10 @@ CREATE TABLE `t_exam`
         COMMENT 'Unique exam code e.g. EXM-G10-MATH-001',
     `title`              VARCHAR(255)     NOT NULL
         COMMENT 'Exam display title',
+    `exam_year`          VARCHAR(50)           NULL
+        COMMENT 'Free-text exam year shown on paper header (any language, e.g. 2026 or ၂၀၂၆ ခုနှစ်)',
+    `examination_center` VARCHAR(255)          NULL
+        COMMENT 'Free-text examination center shown on paper header (any language)',
     `subject_id`         BIGINT UNSIGNED  NOT NULL
         COMMENT 'FK → m_subject.id (RESTRICT on delete)',
     `grade_id`           BIGINT UNSIGNED  NOT NULL
@@ -452,8 +456,6 @@ CREATE TABLE `t_exam`
     `duration_minutes`   INT              NOT NULL DEFAULT 120,
     `total_marks`        DECIMAL(10,2)    NOT NULL DEFAULT 0.00,
     `pass_marks`         DECIMAL(10,2)    NOT NULL DEFAULT 0.00,
-    `exam_date`          DATETIME              NULL
-        COMMENT 'Scheduled exam date (optional, null = anytime)',
     `description`        TEXT                  NULL,
     `exam_config_json`   JSON                 NULL
         COMMENT 'Exam-level config: shuffle, sections, show marks, back navigation, etc.',
@@ -471,7 +473,6 @@ CREATE TABLE `t_exam`
     UNIQUE KEY `uk_t_exam_code`       (`exam_code`),
     KEY `ix_t_exam_subject`           (`subject_id`),
     KEY `ix_t_exam_grade`             (`grade_id`),
-    KEY `ix_t_exam_date`              (`exam_date`),
     KEY `ix_t_exam_active`            (`is_active`, `is_deleted`),
     KEY `fk_t_exam_created_by`        (`created_user_id`),
     KEY `fk_t_exam_updated_by`        (`updated_user_id`),

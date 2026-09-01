@@ -251,7 +251,6 @@ namespace ExamSystem.Migrations
                     duration_minutes = table.Column<int>(type: "int", nullable: false),
                     total_marks = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     pass_marks = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    exam_date = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     exam_config_json = table.Column<string>(type: "longtext", nullable: true)

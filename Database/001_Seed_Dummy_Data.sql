@@ -765,46 +765,46 @@ VALUES
 -- TABLE: t_exams (Exam Papers)
 -- ------------------------------------------------------------
 INSERT INTO t_exams
-(id, exam_code, title, subject_id, grade_id, total_questions, duration_minutes,
- total_marks, pass_marks, exam_date, description, exam_config_json,
+(id, exam_code, title, exam_year, examination_center, subject_id, grade_id, total_questions, duration_minutes,
+ total_marks, pass_marks, description, exam_config_json,
  is_active, is_deleted, created_user_id, updated_user_id, created_datetime, updated_datetime)
 VALUES
 (1, 'EXM-G10-MATH-001',
  'Grade 10 Mathematics - Mid-Term Examination (2026)',
+ '၂၀၂၆ ခုနှစ်', 'မြန်မာနိုင်ငံစာစစ်ဦးစီးဌာန',
  3, 6, 20, 120, 30.0, 12.0,
- '2026-09-15 09:00:00',
  'Covers: Algebra, Geometry, Trigonometry, Statistics. Mix of MCQ + T/F + Short Answer.',
  '{"shuffle":true,"showMarks":true,"allowBack":true,"sections":[{"name":"Section A - MCQ","count":12,"marksEach":1},{"name":"Section B - T/F","count":4,"marksEach":1},{"name":"Section C - Short","count":4,"marksEach":3}]}',
  1, 0, 1, NULL, NOW(), NULL),
 
 (2, 'EXM-G10-ENG-001',
  'Grade 10 English - First Semester Test',
+ '2026', 'Examination Directorate',
  2, 6, 25, 150, 50.0, 20.0,
- '2026-09-16 13:00:00',
  'English Grammar, Vocab, T/F, Fill-blanks and 1 Essay writing question.',
  '{"shuffle":false,"sections":[{"name":"Grammar & Vocab","count":20},{"name":"Writing","count":1,"essayMarks":30}]}',
  1, 0, 1, NULL, NOW(), NULL),
 
 (3, 'EXM-G10-PHY-001',
  'Grade 10 Physics - Unit 1-3 Quiz',
+ NULL, NULL,
  5, 6, 10, 45, 12.0, 5.0,
- '2026-09-10 10:30:00',
  'Physics - Mechanics and Intro Units, quick assessment.',
  NULL,
  1, 0, 4, NULL, NOW(), NULL),
 
 (4, 'EXM-G11-MATH-001',
  'Grade 11 Mathematics - Calculus Mock Test',
+ NULL, NULL,
  12, 7, 15, 90, 40.0, 16.0,
- '2026-10-05 09:00:00',
  'Derivatives, Integrals, Matrix & Determinants.',
  NULL,
  1, 0, 1, NULL, NOW(), NULL),
 
 (5, 'EXM-G10-CHEM-001',
  'Grade 10 Chemistry - Practice Paper',
+ NULL, NULL,
  4, 6, 15, 90, 25.0, 10.0,
- '2026-09-20 11:00:00',
  'Periodic Table, Bonding, Balancing Equations.',
  NULL,
  1, 0, 4, NULL, NOW(), NULL);

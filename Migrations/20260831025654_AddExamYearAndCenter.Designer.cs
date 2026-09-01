@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamSystem.Migrations
 {
     [DbContext(typeof(exam_system_entities))]
-    [Migration("20260820064228_InitialExamSystem")]
-    partial class InitialExamSystem
+    [Migration("20260831025654_AddExamYearAndCenter")]
+    partial class AddExamYearAndCenter
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -457,6 +457,14 @@ namespace ExamSystem.Migrations
 
                     b.Property<string>("exam_config_json")
                         .HasColumnType("longtext");
+
+                    b.Property<string>("exam_year")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("examination_center")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<long>("grade_id")
                         .HasColumnType("bigint");

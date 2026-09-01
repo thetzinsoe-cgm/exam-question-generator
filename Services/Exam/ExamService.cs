@@ -12,6 +12,8 @@ using ExamSystem.Entity;
 using ExamSystem.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 
 namespace ExamSystem.Services.Exam
 {
@@ -128,8 +130,9 @@ namespace ExamSystem.Services.Exam
                 duration_minutes = dto.duration_minutes > 0 ? dto.duration_minutes : Consts.DefaultDurationMinutes,
                 total_marks = 0,
                 pass_marks = dto.pass_marks,
-                exam_date = dto.exam_date,
                 description = dto.description,
+                exam_year = dto.exam_year,
+                examination_center = dto.examination_center,
                 exam_config_json = JsonConvert.SerializeObject(dto.sections),
                 is_active = true,
                 is_deleted = false,
@@ -240,8 +243,9 @@ namespace ExamSystem.Services.Exam
                 duration_minutes = dto.duration_minutes > 0 ? dto.duration_minutes : Consts.DefaultDurationMinutes,
                 total_marks = 0,
                 pass_marks = dto.pass_marks,
-                exam_date = dto.exam_date,
                 description = dto.description,
+                exam_year = dto.exam_year,
+                examination_center = dto.examination_center,
                 exam_config_json = JsonConvert.SerializeObject(dto.sections),
                 is_active = true,
                 is_deleted = false,
@@ -303,7 +307,8 @@ namespace ExamSystem.Services.Exam
             e.subject_id = dto.subject_id;
             e.duration_minutes = dto.duration_minutes;
             e.pass_marks = dto.pass_marks;
-            e.exam_date = dto.exam_date;
+            e.exam_year = dto.exam_year;
+            e.examination_center = dto.examination_center;
             e.is_active = dto.is_active;
             e.updated_datetime = DateTime.Now;
             e.updated_user_id = AuthUser.Id;
@@ -355,7 +360,8 @@ namespace ExamSystem.Services.Exam
             e.subject_id = dto.subject_id;
             e.duration_minutes = dto.duration_minutes > 0 ? dto.duration_minutes : e.duration_minutes;
             e.pass_marks = dto.pass_marks;
-            e.exam_date = dto.exam_date;
+            e.exam_year = dto.exam_year;
+            e.examination_center = dto.examination_center;
             e.exam_config_json = JsonConvert.SerializeObject(dto.sections);
             e.updated_datetime = DateTime.Now;
             e.updated_user_id = AuthUser.Id;
@@ -398,6 +404,8 @@ namespace ExamSystem.Services.Exam
 
         public async Task<byte[]> ExportToPdfAsync(long examId, string printTemplateHtml)
         {
+            printTemplateHtml = EmbedMyanmarFont(printTemplateHtml);
+
             var doc = new HtmlToPdfDocument
             {
                 GlobalSettings =
@@ -445,6 +453,72 @@ namespace ExamSystem.Services.Exam
                 }
             };
             return await Task.FromResult(_pdfConverter.Convert(doc));
+        }
+
+        private static readonly Lazy<string> _myanmarFontFaceCss = new Lazy<string>(BuildMyanmarFontFaceCss);
+
+        private static string BuildMyanmarFontFaceCss()
+        {
+            try
+            {
+                string fontsDir = FindFontsDir();
+                if (fontsDir == null) return string.Empty;
+
+                string regularPath = Path.Combine(fontsDir, "Padauk-Regular.ttf");
+                string boldPath = Path.Combine(fontsDir, "Padauk-Bold.ttf");
+                if (!File.Exists(regularPath)) return string.Empty;
+
+                string regular = Convert.ToBase64String(File.ReadAllBytes(regularPath));
+                string bold = File.Exists(boldPath) ? Convert.ToBase64String(File.ReadAllBytes(boldPath)) : null;
+
+                var sb = new StringBuilder();
+                sb.Append("<style>");
+                sb.Append("@font-face{font-family:'PadaukEmbedded';font-weight:normal;font-style:normal;")
+                  .Append("src:url(data:font/ttf;base64,").Append(regular).Append(") format('truetype');}");
+                if (bold != null)
+                {
+                    sb.Append("@font-face{font-family:'PadaukEmbedded';font-weight:bold;font-style:normal;")
+                      .Append("src:url(data:font/ttf;base64,").Append(bold).Append(") format('truetype');}");
+                }
+                sb.Append("html,body{font-family:'PadaukEmbedded','Pyidaungsu','Noto Sans Myanmar','Myanmar3','Padauk','WinResearcher','Arial Unicode MS','Segoe UI Historic',Tahoma,Arial,sans-serif !important;}");
+                sb.Append("</style>");
+                return sb.ToString();
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private static string FindFontsDir()
+        {
+            var candidates = new List<string>();
+            candidates.Add(Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "fonts"));
+            candidates.Add(Path.Combine(AppContext.BaseDirectory, "App_Data", "fonts"));
+            for (var d = new DirectoryInfo(Directory.GetCurrentDirectory()); d != null; d = d.Parent)
+            {
+                candidates.Add(Path.Combine(d.FullName, "App_Data", "fonts"));
+            }
+            foreach (var cand in candidates)
+            {
+                try
+                {
+                    if (File.Exists(Path.Combine(cand, "Padauk-Regular.ttf"))) return cand;
+                }
+                catch { }
+            }
+            return null;
+        }
+
+        private static string EmbedMyanmarFont(string html)
+        {
+            if (string.IsNullOrWhiteSpace(html)) return html;
+            var style = _myanmarFontFaceCss.Value;
+            if (string.IsNullOrEmpty(style)) return html;
+            var headClose = "</head>";
+            int idx = html.IndexOf(headClose, StringComparison.OrdinalIgnoreCase);
+            if (idx < 0) return style + html;
+            return html.Insert(idx, style);
         }
 
         private List<ExamSectionDto> BuildSectionsFromRules(ExamGenerateRequestDto dto)
@@ -497,8 +571,9 @@ namespace ExamSystem.Services.Exam
                 duration_minutes = e.duration_minutes,
                 total_marks = e.total_marks,
                 pass_marks = e.pass_marks,
-                exam_date = e.exam_date,
                 description = e.description,
+                exam_year = e.exam_year,
+                examination_center = e.examination_center,
                 is_active = e.is_active,
                 created_datetime = e.created_datetime,
                 updated_datetime = e.updated_datetime

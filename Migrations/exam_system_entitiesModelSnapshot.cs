@@ -455,8 +455,13 @@ namespace ExamSystem.Migrations
                     b.Property<string>("exam_config_json")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("exam_date")
-                        .HasColumnType("datetime(6)");
+                    b.Property<string>("exam_year")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("examination_center")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<long>("grade_id")
                         .HasColumnType("bigint");

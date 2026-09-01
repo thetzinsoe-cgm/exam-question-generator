@@ -44,6 +44,7 @@ namespace ExamSystem.Services.Grade
 
             var total = await query.CountAsync();
             var items = await query
+                .Include(g => g.subjects)
                 .OrderBy(g => g.sort_order)
                 .ThenByDescending(g => g.id)
                 .Skip((filter.page_number - 1) * filter.page_size)

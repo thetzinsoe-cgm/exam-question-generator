@@ -88,6 +88,8 @@ namespace ExamSystem.Entity
                 e.HasIndex(x => x.exam_code).IsUnique();
                 e.Property(x => x.exam_code).IsRequired().HasMaxLength(50);
                 e.Property(x => x.title).IsRequired().HasMaxLength(255);
+                e.Property(x => x.exam_year).HasMaxLength(50);
+                e.Property(x => x.examination_center).HasMaxLength(255);
                 e.HasOne(x => x.subject)
                  .WithMany(x => x.exams)
                  .HasForeignKey(x => x.subject_id)
